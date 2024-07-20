@@ -34,7 +34,7 @@ public class UserController {
     private final UserOTPService userOTPService;
 
     /**
-     * View all subscription packages
+     * View all subscription packages ------>
      *
      * @return if authentication token is expire return "error": "invalid_token", and error_description http status -401
      * * if authentication access failed  return "error": "access_denied", "error_description": "Access is denied" http status 403

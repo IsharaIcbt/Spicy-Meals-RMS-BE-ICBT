@@ -16,7 +16,7 @@ import static com.ceyentra.sm.constant.ApplicationConstant.UNAUTHORIZED_USER;
 
 @RestControllerAdvice
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
-
+   /** handle Application exception */
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ErrorMessageResponseDTO> handleAnyException(Exception exception) {
         return new ResponseEntity<>(

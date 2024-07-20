@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/3/2023 4:43 PM
- */
 package com.ceyentra.sm.entity;
 
 import com.ceyentra.sm.enums.UserRole;
@@ -34,14 +30,28 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     String password;
 
+    @Column(name = "nic")
+    String nic;
+
+    @Column(name = "phone_number")
+    String phoneNumber;
+
+    @Column(name = "home_address")
+    String homeAddress;
+
+    @Column(name = "user_role", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    UserRole userRole;
+
     @Column(name = "created_date")
     @CreationTimestamp
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     Date createdDate;
 
-    @Column(name = "user_role", nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    UserRole userRole;
+    @Column(name = "updated_date")
+    @CreationTimestamp
+    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
+    Date updatedDate;
 
     @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'ACTIVE'")
     @Enumerated(value = EnumType.STRING)
@@ -57,13 +67,17 @@ public class UserEntity {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "UserEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", createdDate=" + createdDate +
+                ", nic='" + nic + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", homeAddress='" + homeAddress + '\'' +
                 ", userRole=" + userRole +
+                ", createdDate=" + createdDate +
+                ", updatedDate=" + updatedDate +
                 ", status=" + status +
                 '}';
     }

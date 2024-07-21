@@ -1,4 +1,4 @@
-package com.ceyentra.sm.entity;
+package com.ceyentra.sm.enums;
 
 public enum MealOperationalStatus {
     ACCEPTED, DECLINED, NEW

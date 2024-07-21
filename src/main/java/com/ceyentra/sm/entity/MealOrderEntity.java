@@ -1,6 +1,8 @@
 package com.ceyentra.sm.entity;
 
 import com.ceyentra.sm.enums.CommonStatus;
+import com.ceyentra.sm.enums.MealOperationalStatus;
+import com.ceyentra.sm.enums.MealOrderType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +19,7 @@ import java.util.Date;
 @Data
 @Builder
 @Table(name = "meal_order")
-public class MealOrder {
+public class MealOrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

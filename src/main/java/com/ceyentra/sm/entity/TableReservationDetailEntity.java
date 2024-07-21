@@ -11,36 +11,27 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
-@Table(name = "meal_order_detail")
-public class MealOrderDetail {
+@Table(name = "tables_reservation_detail")
+public class TableReservationDetailEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "meal_order_id")
-    MealOrderEntity mealOrder;
+    @JoinColumn(name = "reservation_id")
+    TableReservationEntity reservation;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "meal_id")
-    MealEntity meal;
-
-    Float price;
-
-    Float discount;
+    @JoinColumn(name = "table_id")
+    TableEntity table;
 
     @Column(name = "created_date")
     @CreationTimestamp
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     Date createdDate;
-
-    @Column(name = "updated_date")
-    @CreationTimestamp
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
-    Date updatedDate;
 }

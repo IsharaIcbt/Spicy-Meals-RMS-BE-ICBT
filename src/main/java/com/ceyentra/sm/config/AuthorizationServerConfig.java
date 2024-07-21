@@ -17,13 +17,9 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import java.util.Arrays;
 
 import static com.ceyentra.sm.constant.OAuth2Constant.*;
 
@@ -33,13 +29,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder encoder;
-    private final CustomTokenEnhancer customTokenEnhancer;
 
     @Autowired
-    public AuthorizationServerConfig(AuthenticationManager authenticationManager, BCryptPasswordEncoder encoder, CustomTokenEnhancer customTokenEnhancer) {
+    public AuthorizationServerConfig(AuthenticationManager authenticationManager, BCryptPasswordEncoder encoder) {
         this.authenticationManager = authenticationManager;
         this.encoder = encoder;
-        this.customTokenEnhancer = customTokenEnhancer;
     }
 
     @Override
@@ -60,16 +54,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
                 .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
+                .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS)
+                .and()
+
+                .withClient(STAFF_CLIENT_ID)
+                .secret(encoder.encode(CLIENT_SECRET))
+                .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
+                .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
+                .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
                 .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-
-        TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
-        enhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
         endpoints.tokenStore(tokenStore())
-                .tokenEnhancer(enhancerChain)
                 .authenticationManager(authenticationManager)
                 .accessTokenConverter(accessTokenConverter())
                 .pathMapping("/oauth/token", "/v1/oauth/token")
@@ -92,11 +90,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
-    }
-
-    @Bean
-    public TokenEnhancer tokenEnhancer() {
-        return customTokenEnhancer;
     }
 
 }

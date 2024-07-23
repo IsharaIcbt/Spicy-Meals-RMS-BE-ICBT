@@ -49,7 +49,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService, UserDetailsServ
 
             switch (authenticationPrincipal.getUsername()) {
                 case "ADMIN":
-                    Optional<AdminEntity> admin = adminRepo.findByUsername(username);
+                    Optional<AdminEntity> admin = adminRepo.findByEmail(username);
 
                     if (!admin.isPresent()) {
                         throw new CustomOauthException("Invalid Credentials.");

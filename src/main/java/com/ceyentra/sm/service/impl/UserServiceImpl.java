@@ -10,7 +10,7 @@ import com.ceyentra.sm.entity.UserEntity;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.exception.UserException;
-import com.ceyentra.sm.repository.UserRepository;
+import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.service.UserOTPService;
 import com.ceyentra.sm.service.UserService;
@@ -36,7 +36,7 @@ import static com.ceyentra.sm.constant.ApplicationConstant.*;
 @Log4j2
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
     private final UserOTPService userOTPService;
     private final ModelMapper modelMapper;
     private final EmailValidator emailValidator;

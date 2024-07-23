@@ -2,6 +2,7 @@ package com.ceyentra.sm.entity;
 
 import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.TableReservationOperationalStatus;
+import com.ceyentra.sm.enums.TableReservationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,8 +49,15 @@ public class TableReservationEntity {
     @Column(name = "approved_by")
     Long approvedBy;
 
-    @Column(name = "approved_note")
+    @Column(name = "approved_note", length = 1000)
     String approvedNote;
+
+    @Column(name = "customer_note", length = 1000)
+    String customerNote;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "table_reservation_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'FAMILY_DINING'")
+    TableReservationType tableReservationType;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "operational_status", columnDefinition = "VARCHAR(255) DEFAULT 'NEW'")

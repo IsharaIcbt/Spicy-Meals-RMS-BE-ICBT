@@ -6,11 +6,14 @@ package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.entity.UserEntity;
 import com.ceyentra.sm.exception.CustomOauthException;
-import com.ceyentra.sm.repository.UserRepository;
+import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.OAuth2UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,10 +30,10 @@ import java.util.Optional;
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 public class OAuth2UserServiceImpl implements OAuth2UserService, UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
 
     @Autowired
-    public OAuth2UserServiceImpl(UserRepository userRepository) {
+    public OAuth2UserServiceImpl(UserRepo userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -38,6 +41,12 @@ public class OAuth2UserServiceImpl implements OAuth2UserService, UserDetailsServ
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("starting function loadUserByUsername @Param username : {}", username);
         try {
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User user1 = (User) authentication.getPrincipal();
+            System.out.println(user1.getUsername());
+            System.out.println(authentication.getAuthorities());
+            System.out.println(authentication.getCredentials());
 
             Optional<UserEntity> byEmail = userRepository.findByEmail(username);
 

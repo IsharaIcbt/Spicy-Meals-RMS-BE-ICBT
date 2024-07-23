@@ -79,7 +79,7 @@ public class UserController {
                 data = USER_DTO_USER_RESPONSE_DTO_FUNCTION.apply(userService.findUserByEmail(value));
             }
 
-        //if no filter found..return all users
+        //if no filter found.return all users
         return new ResponseEntity<>(
                 new ResponseDTO<>(
                         true, data == null ? USER_DTO_LIST_USER_RESPONSE_DTO_LIST_FUNCTION

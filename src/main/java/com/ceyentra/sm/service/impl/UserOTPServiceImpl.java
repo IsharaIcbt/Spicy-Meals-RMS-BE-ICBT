@@ -10,8 +10,8 @@ import com.ceyentra.sm.entity.UserEntity;
 import com.ceyentra.sm.entity.UserOTPEntity;
 import com.ceyentra.sm.exception.UserException;
 import com.ceyentra.sm.exception.UserOTPException;
-import com.ceyentra.sm.repository.UserOTPRepository;
-import com.ceyentra.sm.repository.UserRepository;
+import com.ceyentra.sm.repository.UserOTPRepo;
+import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.UserOTPService;
 import com.ceyentra.sm.util.CustomDateUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,8 @@ import static com.ceyentra.sm.constant.ApplicationConstant.USER_NOT_FOUND;
 @Log4j2
 public class UserOTPServiceImpl implements UserOTPService {
 
-    private final UserOTPRepository userOTPRepository;
-    private final UserRepository userRepository;
+    private final UserOTPRepo userOTPRepository;
+    private final UserRepo userRepository;
     private final CustomDateUtil customDateUtil;
 
     @Override

@@ -37,6 +37,8 @@ public class MealEntity {
 
     Float discount;
 
+    Long rating;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "sub_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'EXTRA'")
     MealTypes subCategory;

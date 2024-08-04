@@ -1,6 +1,7 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.web.request.SaveAdminReqDTO;
+import com.ceyentra.sm.dto.web.response.AdminStaffCommonResDTO;
 import com.ceyentra.sm.entity.AdminEntity;
 import com.ceyentra.sm.entity.RestaurantEntity;
 import com.ceyentra.sm.entity.StaffEntity;
@@ -16,14 +17,11 @@ import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -105,6 +103,24 @@ public class AdminServiceImpl implements AdminService {
                 default:
                     throw new ApplicationServiceException(200, false, "Invalid role");
             }
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Object> getAllAdminPortalUsers() {
+        log.info("START FUNCTION getAllAdminPortalUsers");
+        try {
+            List<AdminStaffCommonResDTO> staffCommonResDTOS = staffRepo.findAllAdminStaffCommonResDTO();
+            List<AdminStaffCommonResDTO> adminCommonResDTOS = adminRepo.findAllAdminStaffCommonResDTO();
+
+            List<Object> allPortalUsers = new ArrayList<>();
+            allPortalUsers.addAll(staffCommonResDTOS);
+            allPortalUsers.addAll(adminCommonResDTOS);
+
+            return allPortalUsers;
         } catch (Exception e) {
             log.error(e);
             throw e;

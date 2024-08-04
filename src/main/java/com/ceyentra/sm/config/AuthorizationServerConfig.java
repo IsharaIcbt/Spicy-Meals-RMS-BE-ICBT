@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/4/2023 11:57 AM
- */
 package com.ceyentra.sm.config;
 
 import com.ceyentra.sm.exception.CustomOauthException;

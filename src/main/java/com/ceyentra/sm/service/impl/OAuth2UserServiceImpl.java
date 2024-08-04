@@ -47,42 +47,32 @@ public class OAuth2UserServiceImpl implements OAuth2UserService, UserDetailsServ
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             User authenticationPrincipal = (User) authentication.getPrincipal();
 
-            switch (authenticationPrincipal.getUsername()) {
-                case "ADMIN":
-                    Optional<AdminEntity> admin = adminRepo.findByEmail(username);
+            Optional<AdminEntity> admin = adminRepo.findByEmail(username);
 
-                    if (!admin.isPresent()) {
-                        throw new CustomOauthException("Invalid Credentials.");
-                    }
-
-                    return new org.springframework.security.core.userdetails.User(
-                            admin.get().getEmail(), admin.get().getPassword(),
-                            getAuthority(admin.get().getUserRole().name())
-                    );
-
-                case "USER":
-                    Optional<UserEntity> customer = userRepository.findByEmail(username);
-
-                    if (!customer.isPresent())
-                        throw new CustomOauthException("Invalid Credentials.");
-
-                    return new org.springframework.security.core.userdetails.User(
-                            customer.get().getEmail(), customer.get().getPassword(),
-                            getAuthority(customer.get().getUserRole().name()));
-
-                case "STAFF":
-                    Optional<StaffEntity> staff = staffRepo.findByEmail(username);
-
-                    if (!staff.isPresent())
-                        throw new CustomOauthException("Invalid Credentials.");
-
-                    return new org.springframework.security.core.userdetails.User(
-                            staff.get().getEmail(), staff.get().getPassword(),
-                            getAuthority(staff.get().getUserRole().name()));
-
-                default:
-                    throw new CustomOauthException("Invalid Credentials.");
+            if (admin.isPresent()) {
+                return new org.springframework.security.core.userdetails.User(
+                        admin.get().getEmail(), admin.get().getPassword(),
+                        getAuthority(admin.get().getUserRole().name())
+                );
             }
+
+            Optional<UserEntity> customer = userRepository.findByEmail(username);
+
+            if (customer.isPresent()) {
+                return new org.springframework.security.core.userdetails.User(
+                        customer.get().getEmail(), customer.get().getPassword(),
+                        getAuthority(customer.get().getUserRole().name()));
+            }
+
+            Optional<StaffEntity> staff = staffRepo.findByEmail(username);
+
+            if (staff.isPresent()) {
+                return new org.springframework.security.core.userdetails.User(
+                        staff.get().getEmail(), staff.get().getPassword(),
+                        getAuthority(staff.get().getUserRole().name()));
+            }
+
+            throw new CustomOauthException("Invalid Credentials.");
 
         } catch (Exception e) {
             log.error("function loadUserByUsername {}", e.getMessage(), e);

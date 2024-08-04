@@ -21,6 +21,9 @@ public class UserEntity {
     @Column(name = "id")
     Long id;
 
+    @Column(name = "img")
+    String img;
+
     @Column(name = "name", nullable = false)
     String name;
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -21,5 +22,6 @@ public class SaveAdminReqDTO {
     String nic;
     String password;
     String phoneNumber;
+    MultipartFile img;
     UserRole role;
 }

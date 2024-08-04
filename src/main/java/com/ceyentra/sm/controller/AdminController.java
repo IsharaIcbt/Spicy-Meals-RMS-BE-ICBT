@@ -32,7 +32,7 @@ public class AdminController {
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody SaveAdminReqDTO saveAdminReqDTO) {
+    public ResponseEntity<CommonResponseDTO> registerUser(@ModelAttribute SaveAdminReqDTO saveAdminReqDTO) {
         adminService.saveAdmin(saveAdminReqDTO);
         return new ResponseEntity<>(
                 CommonResponseDTO.builder()

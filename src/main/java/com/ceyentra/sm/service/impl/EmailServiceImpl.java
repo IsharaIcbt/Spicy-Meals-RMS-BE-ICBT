@@ -117,23 +117,23 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendSampleRequestToManagersOrSREmployees(List<String> emails, SampleRequestDTO sampleRequestDTO, UserRole userRole) throws MessagingException {
         try {
-            switch (userRole) {
-                case MANAGER:
-                    for (String email : emails) {
-                        emailSender.sendSimpleEmail(email,
-                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-                                emailTemplateConstant.sendSampleRequestToManagerTemplate(sampleRequestDTO));
-                    }
-                    break;
-
-                case SAMPLE_ROOM_EMPLOYEE:
-                    for (String email : emails) {
-                        emailSender.sendSimpleEmail(email,
-                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-                                emailTemplateConstant.sendSampleRequestToSREmployeeTemplate(sampleRequestDTO));
-                    }
-                    break;
-            }
+//            switch (userRole) {
+//                case MANAGER:
+//                    for (String email : emails) {
+//                        emailSender.sendSimpleEmail(email,
+//                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
+//                                emailTemplateConstant.sendSampleRequestToManagerTemplate(sampleRequestDTO));
+//                    }
+//                    break;
+//
+//                case SAMPLE_ROOM_EMPLOYEE:
+//                    for (String email : emails) {
+//                        emailSender.sendSimpleEmail(email,
+//                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
+//                                emailTemplateConstant.sendSampleRequestToSREmployeeTemplate(sampleRequestDTO));
+//                    }
+//                    break;
+//            }
         } catch (Exception e) {
             log.info("function sendSampleRequestToManagersAndSREEmployees {}", e.getMessage(), e);
             throw e;

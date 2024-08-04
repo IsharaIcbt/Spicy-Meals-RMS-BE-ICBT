@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/10/2023 5:38 PM
- */
 package com.ceyentra.sm.config;
 
 import org.springframework.context.annotation.Configuration;

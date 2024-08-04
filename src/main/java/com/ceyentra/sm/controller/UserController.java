@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/5/2023 12:33 PM
- */
 package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.config.throttling_config.Throttling;

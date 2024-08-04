@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/4/2023 11:52 AM
- */
 package com.ceyentra.sm.config;
 
 import org.modelmapper.ModelMapper;

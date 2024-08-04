@@ -17,6 +17,7 @@ import com.ceyentra.sm.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.service.spi.ServiceException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class AdminServiceImpl implements AdminService {
     private final StaffRepo staffRepo;
     private final UserRepo userRepo;
     private final RestaurantRepo restaurantRepo;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public void saveAdmin(SaveAdminReqDTO adminReqDTO) {
@@ -68,11 +70,13 @@ public class AdminServiceImpl implements AdminService {
                             .homeAddress(adminReqDTO.getHomeAddress())
                             .nic(adminReqDTO.getNic())
                             .phoneNumber(adminReqDTO.getPhoneNumber())
+                            .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
                             .userRole(UserRole.ADMIN)
-                            .status(CommonStatus.ACTIVE)
+                            .status(adminReqDTO.getStatus())
                             .build();
 
                     adminRepo.save(newAdmin);
+                    break;
 
                 case STAFF:
 
@@ -90,11 +94,13 @@ public class AdminServiceImpl implements AdminService {
                             .homeAddress(adminReqDTO.getHomeAddress())
                             .nic(adminReqDTO.getNic())
                             .phoneNumber(adminReqDTO.getPhoneNumber())
+                            .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
                             .userRole(UserRole.STAFF)
-                            .status(CommonStatus.ACTIVE)
+                            .status(adminReqDTO.getStatus())
                             .build();
 
                     staffRepo.save(newStaff);
+                    break;
 
                 default:
                     throw new ApplicationServiceException(200, false, "Invalid role");

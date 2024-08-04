@@ -1,5 +1,6 @@
 package com.ceyentra.sm.dto.web.request;
 
+import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class SaveAdminReqDTO {
     String phoneNumber;
     MultipartFile img;
     UserRole role;
+    CommonStatus status;
 }

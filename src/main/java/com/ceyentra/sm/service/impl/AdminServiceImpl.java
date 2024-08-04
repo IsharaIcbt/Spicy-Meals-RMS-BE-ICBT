@@ -7,6 +7,7 @@ import com.ceyentra.sm.entity.StaffEntity;
 import com.ceyentra.sm.entity.UserEntity;
 import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.UserRole;
+import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.repository.AdminRepo;
 import com.ceyentra.sm.repository.RestaurantRepo;
@@ -53,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
 
             Optional<UserEntity> userByEmail = userRepo.findByEmail(adminReqDTO.getEmail());
 
-            if (userByEmail.isPresent() && !userByEmail.get().getStatus().equals(CommonStatus.DELETED)) {
+            if (userByEmail.isPresent() && !userByEmail.get().getStatus().equals(UserStatus.DELETED)) {
                 throw new ApplicationServiceException(200, false, "Email is already in use");
             }
 

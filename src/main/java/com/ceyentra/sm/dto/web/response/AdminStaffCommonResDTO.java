@@ -21,12 +21,44 @@ public class AdminStaffCommonResDTO {
     String email;
     String nic;
     String phoneNumber;
+    String password;
+    String tempPassword;
     String homeAddress;
     Long restaurantId;
     CommonStatus status;
     UserRole userRole;
     Date createdDate;
     Date updatedDate;
+
+    public AdminStaffCommonResDTO(Long id, String name, String email, String nic, String phoneNumber, String tempPassword, String homeAddress, CommonStatus status, UserRole userRole, Date createdDate, Date updatedDate) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.nic = nic;
+        this.phoneNumber = phoneNumber;
+        this.tempPassword = tempPassword;
+        this.homeAddress = homeAddress;
+        this.status = status;
+        this.userRole = userRole;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+    }
+
+    public AdminStaffCommonResDTO(Long id, String name, String employeeId, String email, String nic, String phoneNumber, String tempPassword, String homeAddress, Long restaurantId, CommonStatus status, UserRole userRole,Date createdDate, Date updatedDate) {
+        this.id = id;
+        this.name = name;
+        this.employeeId = employeeId;
+        this.email = email;
+        this.nic = nic;
+        this.phoneNumber = phoneNumber;
+        this.tempPassword = tempPassword;
+        this.homeAddress = homeAddress;
+        this.restaurantId = restaurantId;
+        this.status = status;
+        this.userRole = userRole;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+    }
 
     public AdminStaffCommonResDTO(Long id, String name, String employeeId, String email, String nic, String phoneNumber, String homeAddress, Long restaurantId, CommonStatus status, UserRole userRole) {
         this.id = id;

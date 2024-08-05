@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface AdminRepo extends JpaRepository<AdminEntity, Long> {
     Optional<AdminEntity> findByEmail(String username);
 
-    @Query(value = "SELECT new com.ceyentra.sm.dto.web.response.AdminStaffCommonResDTO(ae.id,ae.name,ae.email,ae.nic,ae.phoneNumber,ae.homeAddress,ae.status,ae.userRole,ae.createdDate,ae.updatedDate) FROM AdminEntity ae")
+    @Query(value = "SELECT new com.ceyentra.sm.dto.web.response.AdminStaffCommonResDTO(ae.id,ae.name,ae.email,ae.nic,ae.phoneNumber,ae.tempPassword,ae.homeAddress,ae.status,ae.userRole,ae.createdDate,ae.updatedDate) FROM AdminEntity ae")
     List<AdminStaffCommonResDTO> findAllAdminStaffCommonResDTO();
 }

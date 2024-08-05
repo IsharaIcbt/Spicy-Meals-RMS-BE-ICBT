@@ -69,6 +69,7 @@ public class AdminServiceImpl implements AdminService {
                             .nic(adminReqDTO.getNic())
                             .phoneNumber(adminReqDTO.getPhoneNumber())
                             .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
+                            .tempPassword(adminReqDTO.getPassword())
                             .userRole(UserRole.ADMIN)
                             .status(adminReqDTO.getStatus())
                             .build();
@@ -93,6 +94,7 @@ public class AdminServiceImpl implements AdminService {
                             .nic(adminReqDTO.getNic())
                             .phoneNumber(adminReqDTO.getPhoneNumber())
                             .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
+                            .tempPassword(adminReqDTO.getPassword())
                             .userRole(UserRole.STAFF)
                             .status(adminReqDTO.getStatus())
                             .build();
@@ -125,5 +127,58 @@ public class AdminServiceImpl implements AdminService {
             log.error(e);
             throw e;
         }
+    }
+
+    @Override
+    public Object findOneAdminPortalUser(Long id) {
+        log.info("START FUNCTION findOneAdminPortalUser");
+        try {
+            Optional<AdminEntity> admin = adminRepo.findById(id);
+            if (admin.isPresent()) {
+                return mapToAdminStaffCommonResDTO(admin.get());
+            }
+
+            Optional<StaffEntity> staff = staffRepo.findById(id);
+            if (staff.isPresent()) {
+                return mapToAdminStaffCommonResDTO(staff.get());
+            }
+
+            throw new ApplicationServiceException(404, false, "User not found");
+        } catch (Exception e) {
+            log.error("Error in findOneAdminPortalUser: ", e);
+            throw e;
+        }
+    }
+
+    private AdminStaffCommonResDTO mapToAdminStaffCommonResDTO(AdminEntity admin) {
+        return AdminStaffCommonResDTO.builder()
+                .id(admin.getId())
+                .name(admin.getName())
+                .email(admin.getEmail())
+                .nic(admin.getNic())
+                .phoneNumber(admin.getPhoneNumber())
+                .tempPassword(admin.getTempPassword())
+                .homeAddress(admin.getHomeAddress())
+                .status(admin.getStatus())
+                .userRole(admin.getUserRole())
+                .createdDate(admin.getCreatedDate())
+                .updatedDate(admin.getUpdatedDate())
+                .build();
+    }
+
+    private AdminStaffCommonResDTO mapToAdminStaffCommonResDTO(StaffEntity staff) {
+        return AdminStaffCommonResDTO.builder()
+                .id(staff.getId())
+                .name(staff.getName())
+                .email(staff.getEmail())
+                .nic(staff.getNic())
+                .phoneNumber(staff.getPhoneNumber())
+                .tempPassword(staff.getTempPassword())
+                .homeAddress(staff.getHomeAddress())
+                .status(staff.getStatus())
+                .userRole(staff.getUserRole())
+                .createdDate(staff.getCreatedDate())
+                .updatedDate(staff.getUpdatedDate())
+                .build();
     }
 }

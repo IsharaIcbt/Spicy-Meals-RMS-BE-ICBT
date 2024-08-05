@@ -53,4 +53,16 @@ public class AdminController {
                 , HttpStatus.OK
         );
     }
+
+    @Throttling(timeFrameInSeconds = 60, calls = 20)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDTO<Object>> findAdminPortalUser(@PathVariable Long id) {
+        return new ResponseEntity<>(
+                ResponseDTO.builder()
+                        .success(true)
+                        .data(adminService.findOneAdminPortalUser(id))
+                        .build()
+                , HttpStatus.OK
+        );
+    }
 }

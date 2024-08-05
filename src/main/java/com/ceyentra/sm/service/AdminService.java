@@ -9,4 +9,6 @@ public interface AdminService {
     void saveAdmin(SaveAdminReqDTO adminReqDTO);
 
     List<Object> getAllAdminPortalUsers();
+
+    Object findOneAdminPortalUser(Long id);
 }

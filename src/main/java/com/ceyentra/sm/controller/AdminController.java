@@ -55,12 +55,12 @@ public class AdminController {
     }
 
     @Throttling(timeFrameInSeconds = 60, calls = 20)
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDTO<Object>> findAdminPortalUser(@PathVariable Long id) {
+    @PostMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDTO<Object>> findAdminPortalUser(@RequestParam("email") String email ) {
         return new ResponseEntity<>(
                 ResponseDTO.builder()
                         .success(true)
-                        .data(adminService.findOneAdminPortalUser(id))
+                        .data(adminService.findOneAdminPortalUser(email))
                         .build()
                 , HttpStatus.OK
         );

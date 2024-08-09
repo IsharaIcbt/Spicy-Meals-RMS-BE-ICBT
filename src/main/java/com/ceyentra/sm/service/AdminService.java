@@ -10,5 +10,5 @@ public interface AdminService {
 
     List<Object> getAllAdminPortalUsers();
 
-    Object findOneAdminPortalUser(Long id);
+    Object findOneAdminPortalUser(String email);
 }

@@ -39,77 +39,110 @@ public class AdminServiceImpl implements AdminService {
     public void saveAdmin(SaveAdminReqDTO adminReqDTO) {
         log.info("START FUNCTION saveAdmin");
         try {
+            if (adminReqDTO.getId() == 0) { // Save logic
 
-            Optional<AdminEntity> adminByEmail = adminRepo.findByEmail(adminReqDTO.getEmail());
+                // Check for unique email across Admin, Staff, and User entities
+                validateUniqueEmail(adminReqDTO.getEmail());
 
-            if (adminByEmail.isPresent() && !adminByEmail.get().getStatus().equals(CommonStatus.DELETED)) {
-                throw new ApplicationServiceException(200, false, "Email is already in use");
-            }
+                switch (adminReqDTO.getRole()) {
+                    case ADMIN:
+                        AdminEntity newAdmin = AdminEntity.builder()
+                                .name(adminReqDTO.getName())
+                                .email(adminReqDTO.getEmail())
+                                .homeAddress(adminReqDTO.getHomeAddress())
+                                .nic(adminReqDTO.getNic())
+                                .phoneNumber(adminReqDTO.getPhoneNumber())
+                                .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
+                                .tempPassword(adminReqDTO.getPassword())
+                                .userRole(UserRole.ADMIN)
+                                .status(adminReqDTO.getStatus())
+                                .build();
 
-            Optional<StaffEntity> staffByEmail = staffRepo.findByEmail(adminReqDTO.getEmail());
+                        adminRepo.save(newAdmin);
+                        break;
 
-            if (staffByEmail.isPresent() && !staffByEmail.get().getStatus().equals(CommonStatus.DELETED)) {
-                throw new ApplicationServiceException(200, false, "Email is already in use");
-            }
+                    case STAFF:
+                        Optional<RestaurantEntity> restaurantEntity = restaurantRepo.findById(adminReqDTO.getRestaurantId());
+                        if (!restaurantEntity.isPresent() || restaurantEntity.get().getStatus().equals(CommonStatus.DELETED)) {
+                            throw new ApplicationServiceException(200, false, "Restaurant not found");
+                        }
 
-            Optional<UserEntity> userByEmail = userRepo.findByEmail(adminReqDTO.getEmail());
+                        StaffEntity newStaff = StaffEntity.builder()
+                                .name(adminReqDTO.getName())
+                                .employeeId("STAFF_" + UUID.randomUUID() + "_" + new Date())
+                                .restaurant(restaurantEntity.get())
+                                .email(adminReqDTO.getEmail())
+                                .homeAddress(adminReqDTO.getHomeAddress())
+                                .nic(adminReqDTO.getNic())
+                                .phoneNumber(adminReqDTO.getPhoneNumber())
+                                .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
+                                .tempPassword(adminReqDTO.getPassword())
+                                .userRole(UserRole.STAFF)
+                                .status(adminReqDTO.getStatus())
+                                .build();
 
-            if (userByEmail.isPresent() && !userByEmail.get().getStatus().equals(UserStatus.DELETED)) {
-                throw new ApplicationServiceException(200, false, "Email is already in use");
-            }
+                        staffRepo.save(newStaff);
+                        break;
 
-            switch (adminReqDTO.getRole()) {
+                    default:
+                        throw new ApplicationServiceException(200, false, "Invalid role");
+                }
 
-                case ADMIN:
+            } else { // Update logic
+                switch (adminReqDTO.getRole()) {
+                    case ADMIN:
+                        AdminEntity existingAdmin = adminRepo.findById(adminReqDTO.getId())
+                                .orElseThrow(() -> new ApplicationServiceException(200, false, "Cannot find Related User Account"));
 
-                    AdminEntity newAdmin = AdminEntity.builder()
-                            .name(adminReqDTO.getName())
-                            .email(adminReqDTO.getEmail())
-                            .homeAddress(adminReqDTO.getHomeAddress())
-                            .nic(adminReqDTO.getNic())
-                            .phoneNumber(adminReqDTO.getPhoneNumber())
-                            .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
-                            .tempPassword(adminReqDTO.getPassword())
-                            .userRole(UserRole.ADMIN)
-                            .status(adminReqDTO.getStatus())
-                            .build();
+                        existingAdmin.setName(adminReqDTO.getName());
+                        existingAdmin.setHomeAddress(adminReqDTO.getHomeAddress());
+                        existingAdmin.setNic(adminReqDTO.getNic());
+                        existingAdmin.setPhoneNumber(adminReqDTO.getPhoneNumber());
+                        existingAdmin.setPassword(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()));
+                        existingAdmin.setTempPassword(adminReqDTO.getPassword());
+                        existingAdmin.setStatus(adminReqDTO.getStatus());
 
-                    adminRepo.save(newAdmin);
-                    break;
+                        adminRepo.save(existingAdmin);
+                        break;
 
-                case STAFF:
+                    case STAFF:
+                        StaffEntity existingStaff = staffRepo.findById(adminReqDTO.getId())
+                                .orElseThrow(() -> new ApplicationServiceException(200, false, "Cannot find Related User Account"));
 
-                    Optional<RestaurantEntity> restaurantEntity = restaurantRepo.findById(adminReqDTO.getRestaurantId());
+                        Optional<RestaurantEntity> restaurantEntity = restaurantRepo.findById(adminReqDTO.getRestaurantId());
+                        if (!restaurantEntity.isPresent() || restaurantEntity.get().getStatus().equals(CommonStatus.DELETED)) {
+                            throw new ApplicationServiceException(200, false, "Restaurant not found");
+                        }
 
-                    if (!restaurantEntity.isPresent() || restaurantEntity.get().getStatus().equals(CommonStatus.DELETED)) {
-                        throw new ApplicationServiceException(200, false, "Restaurant not found");
-                    }
+                        existingStaff.setName(adminReqDTO.getName());
+                        existingStaff.setHomeAddress(adminReqDTO.getHomeAddress());
+                        existingStaff.setNic(adminReqDTO.getNic());
+                        existingStaff.setPhoneNumber(adminReqDTO.getPhoneNumber());
+                        existingStaff.setPassword(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()));
+                        existingStaff.setTempPassword(adminReqDTO.getPassword());
+                        existingStaff.setRestaurant(restaurantEntity.get());
+                        existingStaff.setStatus(adminReqDTO.getStatus());
 
-                    StaffEntity newStaff = StaffEntity.builder()
-                            .name(adminReqDTO.getName())
-                            .employeeId("STAFF_" + UUID.randomUUID() + "_" + new Date())
-                            .restaurant(restaurantEntity.get())
-                            .email(adminReqDTO.getEmail())
-                            .homeAddress(adminReqDTO.getHomeAddress())
-                            .nic(adminReqDTO.getNic())
-                            .phoneNumber(adminReqDTO.getPhoneNumber())
-                            .password(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()))
-                            .tempPassword(adminReqDTO.getPassword())
-                            .userRole(UserRole.STAFF)
-                            .status(adminReqDTO.getStatus())
-                            .build();
+                        staffRepo.save(existingStaff);
+                        break;
 
-                    staffRepo.save(newStaff);
-                    break;
-
-                default:
-                    throw new ApplicationServiceException(200, false, "Invalid role");
+                    default:
+                        throw new ApplicationServiceException(200, false, "Invalid role");
+                }
             }
         } catch (Exception e) {
-            log.error(e);
+            log.error("==>" + e);
             throw e;
         }
     }
+
+    private void validateUniqueEmail(String email) {
+        if (adminRepo.findByEmail(email).isPresent() || staffRepo.findByEmail(email).isPresent() || userRepo.findByEmail(email).isPresent()) {
+            throw new ApplicationServiceException(200, false, "Email is already in use");
+        }
+    }
+
+
 
     @Override
     public List<Object> getAllAdminPortalUsers() {
@@ -130,15 +163,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Object findOneAdminPortalUser(Long id) {
+    public Object findOneAdminPortalUser(String email) {
         log.info("START FUNCTION findOneAdminPortalUser");
         try {
-            Optional<AdminEntity> admin = adminRepo.findById(id);
+            Optional<AdminEntity> admin = adminRepo.findByEmail(email);
             if (admin.isPresent()) {
                 return mapToAdminStaffCommonResDTO(admin.get());
             }
 
-            Optional<StaffEntity> staff = staffRepo.findById(id);
+            Optional<StaffEntity> staff = staffRepo.findByEmail(email);
             if (staff.isPresent()) {
                 return mapToAdminStaffCommonResDTO(staff.get());
             }
@@ -169,11 +202,13 @@ public class AdminServiceImpl implements AdminService {
     private AdminStaffCommonResDTO mapToAdminStaffCommonResDTO(StaffEntity staff) {
         return AdminStaffCommonResDTO.builder()
                 .id(staff.getId())
+                .employeeId(staff.getEmployeeId())
                 .name(staff.getName())
                 .email(staff.getEmail())
                 .nic(staff.getNic())
                 .phoneNumber(staff.getPhoneNumber())
                 .tempPassword(staff.getTempPassword())
+                .restaurantId(staff.getRestaurant().getId())
                 .homeAddress(staff.getHomeAddress())
                 .status(staff.getStatus())
                 .userRole(staff.getUserRole())

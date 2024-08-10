@@ -63,7 +63,7 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+   /* @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")*/
     public ResponseEntity<ResponseDTO<Object>> getAllUsers(
             @RequestParam(value = "key", required = false) String key,
             @RequestParam(value = "value", required = false) String value) {

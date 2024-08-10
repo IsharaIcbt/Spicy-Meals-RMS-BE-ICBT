@@ -19,10 +19,16 @@ import java.util.Date;
 public class UserDTO {
 
     private Long id;
+    private String img;
     private String name;
-    private String password;
     private String email;
-    private Date createdDate;
+    private String password;
+    private String nic;
+    private String phoneNumber;
+    private String homeAddress;
     private UserRole userRole;
+    private Date createdDate;
     private UserStatus userStatus;
 }
+
+

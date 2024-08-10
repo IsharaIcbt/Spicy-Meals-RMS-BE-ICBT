@@ -1,13 +1,16 @@
 package com.ceyentra.sm.controller;
 
+import com.ceyentra.sm.config.throttling_config.Throttling;
+import com.ceyentra.sm.dto.common.CommonResponseDTO;
+import com.ceyentra.sm.dto.web.request.SaveAdminReqDTO;
+import com.ceyentra.sm.dto.web.request.SaveMealReqDTO;
 import com.ceyentra.sm.dto.web.response.MealsFilterResDTO;
 import com.ceyentra.sm.service.MealService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -26,4 +29,19 @@ public class MealsController {
 
         return ResponseEntity.status(200).body(filterResDTO);
     }
+
+    @Throttling(timeFrameInSeconds = 60, calls = 20)
+    @PostMapping(value = "/product", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponseDTO> saveMeal(@ModelAttribute SaveMealReqDTO saveMealReqDTO) {
+        mealService.saveMeal(saveMealReqDTO);
+        return new ResponseEntity<>(
+                CommonResponseDTO.builder()
+                        .success(true)
+                        .message("Meal successfully Saved.")
+                        .build()
+                , HttpStatus.OK
+        );
+    }
+
+
 }

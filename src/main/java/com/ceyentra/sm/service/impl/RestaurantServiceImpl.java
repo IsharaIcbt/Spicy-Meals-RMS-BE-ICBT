@@ -1,6 +1,7 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.web.request.SaveRestaurantRequestDTO;
+import com.ceyentra.sm.dto.web.response.RestaurantIdsResDTO;
 import com.ceyentra.sm.dto.web.response.RestaurantResponseDTO;
 import com.ceyentra.sm.entity.RestaurantEntity;
 import com.ceyentra.sm.exception.ApplicationServiceException;
@@ -13,9 +14,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +91,23 @@ public class RestaurantServiceImpl implements RestaurantService {
             log.error("Error in findOneAdminPortalUser: ", e);
             throw e;
         }
+    }
+
+    @Override
+    public List<RestaurantIdsResDTO> findAllRestaurantsIds() {
+
+        List<RestaurantEntity> all = restaurantRepo.findAll();
+
+        List<RestaurantIdsResDTO> restaurantIdsResDTOList = new ArrayList<>();
+
+        for (RestaurantEntity restaurantEntity : all) {
+            RestaurantIdsResDTO dto = RestaurantIdsResDTO.builder()
+                    .value(restaurantEntity.getId())
+                    .label(restaurantEntity.getName())
+                    .build();
+            restaurantIdsResDTOList.add(dto);
+        }
+        return restaurantIdsResDTOList;
     }
 
     private RestaurantResponseDTO mapRestaurantCommonDTO(RestaurantEntity restaurant) {

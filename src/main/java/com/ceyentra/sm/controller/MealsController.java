@@ -2,6 +2,7 @@ package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.config.throttling_config.Throttling;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
+import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.SaveAdminReqDTO;
 import com.ceyentra.sm.dto.web.request.SaveMealReqDTO;
 import com.ceyentra.sm.dto.web.response.MealsFilterResDTO;
@@ -42,6 +43,19 @@ public class MealsController {
                 , HttpStatus.OK
         );
     }
+
+    @Throttling(timeFrameInSeconds = 60, calls = 20)
+    @GetMapping(value = "/product/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDTO<Object>> findSpecificMealById(@PathVariable Long id) {
+        return new ResponseEntity<>(
+                ResponseDTO.builder()
+                        .success(true)
+                        .data(mealService.findMealById(id))
+                        .build()
+                , HttpStatus.OK
+        );
+    }
+
 
 
 }

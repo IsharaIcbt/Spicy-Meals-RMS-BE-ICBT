@@ -75,23 +75,25 @@ public class MealServiceImpl implements MealService {
                     throw new ApplicationServiceException(200, false, "Sorry required meal  not found");
                 }
 
-                MealEntity newMealEntity = MealEntity.builder()
-                        .id(saveMealReqDTO.getId())
-                        .name(saveMealReqDTO.getName())
-                        .image("https://picsum.photos/seed/1/200/300")// TODO: this image should save s3 but currently set random image
-                        .description(saveMealReqDTO.getDescription())
-                        .price(saveMealReqDTO.getPrice())
-                        .discount(saveMealReqDTO.getDiscount())
-                        .rating(saveMealReqDTO.getRating())
-                        .subCategory(saveMealReqDTO.getSubCategory())
-                        .mainCategory(saveMealReqDTO.getMainCategory())
-                        .mealType(saveMealReqDTO.getMealType())
-                        .restaurant(restaurantEntity.get())
-                        .status(saveMealReqDTO.getStatus())
-                        .updatedDate(new Date())
-                        .build();
+                // Fetch the existing entity
+                MealEntity existingMealEntity = byId.get();
 
-                mealsRepo.save(newMealEntity);
+                // Update the necessary fields while preserving createdDate
+                existingMealEntity.setName(saveMealReqDTO.getName());
+                existingMealEntity.setImage("https://picsum.photos/seed/1/200/300"); // TODO: Save image to S3
+                existingMealEntity.setDescription(saveMealReqDTO.getDescription());
+                existingMealEntity.setPrice(saveMealReqDTO.getPrice());
+                existingMealEntity.setDiscount(saveMealReqDTO.getDiscount());
+                existingMealEntity.setRating(saveMealReqDTO.getRating());
+                existingMealEntity.setSubCategory(saveMealReqDTO.getSubCategory());
+                existingMealEntity.setMainCategory(saveMealReqDTO.getMainCategory());
+                existingMealEntity.setMealType(saveMealReqDTO.getMealType());
+                existingMealEntity.setRestaurant(restaurantEntity.get());
+                existingMealEntity.setStatus(saveMealReqDTO.getStatus());
+                existingMealEntity.setUpdatedDate(new Date()); // Update the updated date
+
+                // Save the updated entity
+                mealsRepo.save(existingMealEntity);
             }
         } catch (Exception e) {
             log.error(e);

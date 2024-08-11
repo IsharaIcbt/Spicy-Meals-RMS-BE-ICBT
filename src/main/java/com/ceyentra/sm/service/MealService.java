@@ -10,4 +10,6 @@ public interface MealService {
     List<MealResDTO> findAllMeals();
 
     void saveMeal(SaveMealReqDTO saveMealReqDTO);
+
+    Object findMealById(Long id);
 }

@@ -1,6 +1,7 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.web.request.SaveMealReqDTO;
+import com.ceyentra.sm.dto.web.response.MealCommonResDTO;
 import com.ceyentra.sm.dto.web.response.MealResDTO;
 import com.ceyentra.sm.entity.MealEntity;
 import com.ceyentra.sm.entity.RestaurantEntity;
@@ -75,6 +76,7 @@ public class MealServiceImpl implements MealService {
                 }
 
                 MealEntity newMealEntity = MealEntity.builder()
+                        .id(saveMealReqDTO.getId())
                         .name(saveMealReqDTO.getName())
                         .image("https://picsum.photos/seed/1/200/300")// TODO: this image should save s3 but currently set random image
                         .description(saveMealReqDTO.getDescription())
@@ -95,5 +97,41 @@ public class MealServiceImpl implements MealService {
             log.error(e);
             throw e;
         }
+    }
+
+    @Override
+    public Object findMealById(Long id) {
+        log.info("START FUNCTION findMealById {} ", id);
+        try {
+            Optional<MealEntity> meal = mealsRepo.findById(id);
+
+            if (meal.isPresent()) {
+                return mapMealCommonDTO(meal.get());
+            }
+
+            throw new ApplicationServiceException(404, false, "Meal not found");
+        } catch (Exception e) {
+            log.error("Error in findOneAdminPortalUser: ", e);
+            throw e;
+        }
+    }
+
+    private MealCommonResDTO mapMealCommonDTO(MealEntity meal) {
+        return MealCommonResDTO.builder()
+                .id(meal.getId())
+                .restaurantId(meal.getRestaurant().getId())
+                .name(meal.getName())
+                .mainCategory(meal.getMainCategory())
+                .subCategory(meal.getSubCategory())
+                .mealType(meal.getMealType())
+                .price(meal.getPrice())
+                .discount(meal.getDiscount())
+                .status(meal.getStatus())
+                .rating(meal.getRating())
+                .description(meal.getDescription())
+                .img(meal.getImage())
+                .createdDate(meal.getCreatedDate())
+                .updatedDate(meal.getUpdatedDate())
+                .build();
     }
 }

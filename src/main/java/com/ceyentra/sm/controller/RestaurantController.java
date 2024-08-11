@@ -33,12 +33,24 @@ public class RestaurantController {
 
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody SaveRestaurantRequestDTO saveRestaurantRequestDTO) {
+    public ResponseEntity<CommonResponseDTO> registerRestaurant(@RequestBody SaveRestaurantRequestDTO saveRestaurantRequestDTO) {
         restaurantService.saveRestaurant(saveRestaurantRequestDTO);
         return new ResponseEntity<>(
                 CommonResponseDTO.builder()
                         .success(true)
                         .message("Admin successfully registered.")
+                        .build()
+                , HttpStatus.OK
+        );
+    }
+
+    @Throttling(timeFrameInSeconds = 60, calls = 20)
+    @GetMapping(value = "/branch/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDTO<Object>> findRestaurantById(@PathVariable Long id) {
+        return new ResponseEntity<>(
+                ResponseDTO.builder()
+                        .success(true)
+                        .data(restaurantService.findRestaurantById(id))
                         .build()
                 , HttpStatus.OK
         );

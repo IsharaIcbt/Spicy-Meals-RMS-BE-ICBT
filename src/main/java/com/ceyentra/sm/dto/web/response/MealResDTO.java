@@ -16,6 +16,7 @@ import java.util.Date;
 public class MealResDTO {
 
     Long id;
+    Long restaurantId;
     String name;
     String image;
     String description;

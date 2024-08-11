@@ -54,18 +54,20 @@ public class RestaurantServiceImpl implements RestaurantService {
                 if (!byId.isPresent()) {
                     throw new ApplicationServiceException(200, false, "Sorry required restaurant  not found");
                 }
-                RestaurantEntity newRestaurant = RestaurantEntity.builder()
-                        .id(saveRestaurantRequestDTO.getId())
-                        .name(saveRestaurantRequestDTO.getName())
-                        .email(saveRestaurantRequestDTO.getEmail())
-                        .address(saveRestaurantRequestDTO.getAddress())
-                        .branchCode(saveRestaurantRequestDTO.getBranchCode())
-                        .phone(saveRestaurantRequestDTO.getPhone())
-                        .updatedDate(new Date())
-                        .status(saveRestaurantRequestDTO.getStatus())
-                        .build();
 
-                restaurantRepo.save(newRestaurant);
+                // Fetch the existing entity
+                RestaurantEntity existingRestaurant = byId.get();
+
+                // Update fields while preserving createdDate
+                existingRestaurant.setName(saveRestaurantRequestDTO.getName());
+                existingRestaurant.setEmail(saveRestaurantRequestDTO.getEmail());
+                existingRestaurant.setAddress(saveRestaurantRequestDTO.getAddress());
+                existingRestaurant.setBranchCode(saveRestaurantRequestDTO.getBranchCode());
+                existingRestaurant.setPhone(saveRestaurantRequestDTO.getPhone());
+                existingRestaurant.setUpdatedDate(new Date()); // Set the updated date
+                existingRestaurant.setStatus(saveRestaurantRequestDTO.getStatus());
+
+                restaurantRepo.save(existingRestaurant);
             }
 
 
@@ -73,6 +75,37 @@ public class RestaurantServiceImpl implements RestaurantService {
             log.error(e);
             throw e;
         }
+    }
+
+    @Override
+    public Object findRestaurantById(Long id) {
+        log.info("START FUNCTION findRestaurantById {} ", id);
+        try {
+            Optional<RestaurantEntity> restaurant = restaurantRepo.findById(id);
+
+            if (restaurant.isPresent()) {
+                return mapRestaurantCommonDTO(restaurant.get());
+            }
+
+            throw new ApplicationServiceException(404, false, "restaurant not found");
+        } catch (Exception e) {
+            log.error("Error in findOneAdminPortalUser: ", e);
+            throw e;
+        }
+    }
+
+    private RestaurantResponseDTO mapRestaurantCommonDTO(RestaurantEntity restaurant) {
+        return RestaurantResponseDTO.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .email(restaurant.getEmail())
+                .phone(restaurant.getPhone())
+                .address(restaurant.getAddress())
+                .branchCode(restaurant.getBranchCode())
+                .status(restaurant.getStatus())
+                .createdDate(restaurant.getCreatedDate())
+                .updatedDate(restaurant.getUpdatedDate())
+                .build();
     }
 }
 

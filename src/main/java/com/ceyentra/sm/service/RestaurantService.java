@@ -8,6 +8,7 @@ import java.util.List;
 public interface RestaurantService {
     List<RestaurantResponseDTO> findAllRestaurants();
 
-
     void saveRestaurant(SaveRestaurantRequestDTO saveRestaurantRequestDTO);
+
+    Object findRestaurantById(Long id);
 }

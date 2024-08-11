@@ -101,6 +101,7 @@ public class AdminServiceImpl implements AdminService {
                         existingAdmin.setPassword(bCryptPasswordEncoder.encode(adminReqDTO.getPassword()));
                         existingAdmin.setTempPassword(adminReqDTO.getPassword());
                         existingAdmin.setStatus(adminReqDTO.getStatus());
+                        existingAdmin.setUpdatedDate(new Date());
 
                         adminRepo.save(existingAdmin);
                         break;
@@ -122,6 +123,7 @@ public class AdminServiceImpl implements AdminService {
                         existingStaff.setTempPassword(adminReqDTO.getPassword());
                         existingStaff.setRestaurant(restaurantEntity.get());
                         existingStaff.setStatus(adminReqDTO.getStatus());
+                        existingStaff.setUpdatedDate(new Date());
 
                         staffRepo.save(existingStaff);
                         break;

@@ -21,11 +21,22 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<Object>> findAllMeals() {
+    public ResponseEntity<ResponseDTO<Object>> findAllRestaurants() {
         return new ResponseEntity<>(
                 ResponseDTO.builder()
                         .success(true)
                         .data(restaurantService.findAllRestaurants())
+                        .build()
+                , HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/branch/ids")
+    public ResponseEntity<ResponseDTO<Object>> getAllRestaurantsIds() {
+        return new ResponseEntity<>(
+                ResponseDTO.builder()
+                        .success(true)
+                        .data(restaurantService.findAllRestaurantsIds())
                         .build()
                 , HttpStatus.OK
         );
@@ -38,7 +49,7 @@ public class RestaurantController {
         return new ResponseEntity<>(
                 CommonResponseDTO.builder()
                         .success(true)
-                        .message("Admin successfully registered.")
+                        .message("Restaurant successfully registered.")
                         .build()
                 , HttpStatus.OK
         );

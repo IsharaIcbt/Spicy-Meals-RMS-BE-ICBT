@@ -64,11 +64,16 @@ public class MealServiceImpl implements MealService {
             if (!restaurantEntity.isPresent() || restaurantEntity.get().getStatus().equals(CommonStatus.DELETED)) {
                 throw new ApplicationServiceException(200, false, "Restaurant not found");
             }
+
+            // Initialize fileURL variable
+            String fileURL = null;
             MultipartFile file = saveMealReqDTO.getImg();
-            String fileURL  = s3BucketUtil.uploadMultipartToS3bucket(RESUME_S3_BUCKET_FOLDER + generateFileName(saveMealReqDTO.getImg()), saveMealReqDTO.getImg());
+
+            // Only attempt to upload the file if it is not null
+            if (file != null && !file.isEmpty()) {
+                fileURL = s3BucketUtil.uploadMultipartToS3bucket(RESUME_S3_BUCKET_FOLDER + generateFileName(file), file);
+            }
             if (saveMealReqDTO.getId() == 0) {
-
-
 
                 log.info("SAVE MEAL :- Id {}", 0);
                 MealEntity newMealEntity = MealEntity.builder()
@@ -96,6 +101,11 @@ public class MealServiceImpl implements MealService {
 
                 // Fetch the existing entity
                 MealEntity existingMealEntity = byId.get();
+
+                // If fileURL is null, retain the existing image URL
+                if (fileURL == null){
+                    fileURL = existingMealEntity.getImage();
+                }
 
                 // Update the necessary fields while preserving createdDate
                 existingMealEntity.setName(saveMealReqDTO.getName());

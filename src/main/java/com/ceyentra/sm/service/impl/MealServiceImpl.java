@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.ceyentra.sm.constant.ApplicationConstant.RESUME_S3_BUCKET_FOLDER;
+import static com.ceyentra.sm.constant.ApplicationConstant.MEALS_S3_BUCKET_FOLDER;
 
 
 @Service
@@ -71,7 +71,7 @@ public class MealServiceImpl implements MealService {
 
             // Only attempt to upload the file if it is not null
             if (file != null && !file.isEmpty()) {
-                fileURL = s3BucketUtil.uploadMultipartToS3bucket(RESUME_S3_BUCKET_FOLDER + generateFileName(file), file);
+                fileURL = s3BucketUtil.uploadMultipartToS3bucket(MEALS_S3_BUCKET_FOLDER + generateFileName(file), file);
             }
             if (saveMealReqDTO.getId() == 0) {
 

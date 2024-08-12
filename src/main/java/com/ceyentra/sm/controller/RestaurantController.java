@@ -3,7 +3,6 @@ package com.ceyentra.sm.controller;
 import com.ceyentra.sm.config.throttling_config.Throttling;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
-import com.ceyentra.sm.dto.web.request.SaveAdminReqDTO;
 import com.ceyentra.sm.dto.web.request.SaveRestaurantRequestDTO;
 import com.ceyentra.sm.service.RestaurantService;
 import lombok.RequiredArgsConstructor;

@@ -8,6 +8,8 @@ public class ApplicationConstant {
 
     public static final String APPLICATION_ERROR_OCCURRED_MESSAGE = "Application Error Occurred.";
 
+    public static final String RESUME_S3_BUCKET_FOLDER = "meals/";
+
     public static final String API_BASE_URL = "/v1";
     public static final int COMMON_ERROR_CODE = 100;
     public static final int USER_NOT_FOUND = 404;

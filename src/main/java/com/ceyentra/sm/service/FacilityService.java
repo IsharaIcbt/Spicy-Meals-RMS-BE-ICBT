@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface FacilityService {
     List<FacilityCommonResDTO> findAllFacilities();
+
+    Object findFacilityById(Long id);
 }

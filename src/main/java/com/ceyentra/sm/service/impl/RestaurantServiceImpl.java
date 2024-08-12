@@ -88,9 +88,23 @@ public class RestaurantServiceImpl implements RestaurantService {
 
             throw new ApplicationServiceException(404, false, "restaurant not found");
         } catch (Exception e) {
-            log.error("Error in findOneAdminPortalUser: ", e);
+            log.error("Error in findRestaurantById: ", e);
             throw e;
         }
+    }
+
+    private RestaurantResponseDTO mapRestaurantCommonDTO(RestaurantEntity restaurant) {
+        return RestaurantResponseDTO.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .email(restaurant.getEmail())
+                .phone(restaurant.getPhone())
+                .address(restaurant.getAddress())
+                .branchCode(restaurant.getBranchCode())
+                .status(restaurant.getStatus())
+                .createdDate(restaurant.getCreatedDate())
+                .updatedDate(restaurant.getUpdatedDate())
+                .build();
     }
 
     @Override
@@ -110,18 +124,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantIdsResDTOList;
     }
 
-    private RestaurantResponseDTO mapRestaurantCommonDTO(RestaurantEntity restaurant) {
-        return RestaurantResponseDTO.builder()
-                .id(restaurant.getId())
-                .name(restaurant.getName())
-                .email(restaurant.getEmail())
-                .phone(restaurant.getPhone())
-                .address(restaurant.getAddress())
-                .branchCode(restaurant.getBranchCode())
-                .status(restaurant.getStatus())
-                .createdDate(restaurant.getCreatedDate())
-                .updatedDate(restaurant.getUpdatedDate())
-                .build();
-    }
+
 }
 

@@ -9,7 +9,8 @@ public class ApplicationConstant {
     public static final String APPLICATION_ERROR_OCCURRED_MESSAGE = "Application Error Occurred.";
 
     /*s3 bucket meal images path */
-    public static final String RESUME_S3_BUCKET_FOLDER = "meals/";
+    public static final String MEALS_S3_BUCKET_FOLDER = "meals/";
+    public static final String FACILITY_S3_BUCKET_FOLDER = "facility/";
 
     public static final String API_BASE_URL = "/v1";
     public static final int COMMON_ERROR_CODE = 100;

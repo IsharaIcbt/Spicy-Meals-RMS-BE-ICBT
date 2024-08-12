@@ -8,6 +8,7 @@ public class ApplicationConstant {
 
     public static final String APPLICATION_ERROR_OCCURRED_MESSAGE = "Application Error Occurred.";
 
+    /*s3 bucket meal images path */
     public static final String RESUME_S3_BUCKET_FOLDER = "meals/";
 
     public static final String API_BASE_URL = "/v1";

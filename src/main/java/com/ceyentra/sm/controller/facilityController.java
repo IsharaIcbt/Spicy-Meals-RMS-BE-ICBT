@@ -1,7 +1,9 @@
 package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.config.throttling_config.Throttling;
+import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
+import com.ceyentra.sm.dto.web.request.SaveFacilityReqDTO;
 import com.ceyentra.sm.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,19 @@ public class facilityController {
                 ResponseDTO.builder()
                         .success(true)
                         .data(facilityService.findFacilityById(id))
+                        .build()
+                , HttpStatus.OK
+        );
+    }
+
+    @Throttling(timeFrameInSeconds = 60, calls = 20)
+    @PostMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CommonResponseDTO> registerFacility(@RequestBody SaveFacilityReqDTO saveFacilityReqDTO) {
+        facilityService.saveFacility(saveFacilityReqDTO);
+        return new ResponseEntity<>(
+                CommonResponseDTO.builder()
+                        .success(true)
+                        .message("Facility successfully registered.")
                         .build()
                 , HttpStatus.OK
         );

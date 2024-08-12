@@ -10,17 +10,20 @@ import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.repository.MealsRepo;
 import com.ceyentra.sm.repository.RestaurantRepo;
 import com.ceyentra.sm.service.MealService;
+import com.ceyentra.sm.util.S3BucketUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ceyentra.sm.constant.ApplicationConstant.RESUME_S3_BUCKET_FOLDER;
 
 
 @Service
@@ -32,6 +35,7 @@ public class MealServiceImpl implements MealService {
     private final MealsRepo mealsRepo;
     private final ModelMapper modelMapper;
     private final RestaurantRepo restaurantRepo;
+    private final S3BucketUtil s3BucketUtil;
 
     @Override
     public List<MealResDTO> findAllMeals() {
@@ -39,6 +43,17 @@ public class MealServiceImpl implements MealService {
                 new TypeToken<List<MealResDTO>>() {
                 }.getType());
     }
+
+    /**
+     * This method is used to generate file names.
+     *
+     * @param multiPart
+     * @return sting file name
+     */
+    private String generateFileName(MultipartFile multiPart) {
+        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+    }
+
 
     @Override
     public void saveMeal(SaveMealReqDTO saveMealReqDTO) {
@@ -49,12 +64,16 @@ public class MealServiceImpl implements MealService {
             if (!restaurantEntity.isPresent() || restaurantEntity.get().getStatus().equals(CommonStatus.DELETED)) {
                 throw new ApplicationServiceException(200, false, "Restaurant not found");
             }
-
+            MultipartFile file = saveMealReqDTO.getImg();
+            String fileURL  = s3BucketUtil.uploadMultipartToS3bucket(RESUME_S3_BUCKET_FOLDER + generateFileName(saveMealReqDTO.getImg()), saveMealReqDTO.getImg());
             if (saveMealReqDTO.getId() == 0) {
+
+
+
                 log.info("SAVE MEAL :- Id {}", 0);
                 MealEntity newMealEntity = MealEntity.builder()
                         .name(saveMealReqDTO.getName())
-                        .image("https://picsum.photos/seed/1/200/300") // TODO: this image should save s3 but currently set random image
+                        .image(fileURL)
                         .description(saveMealReqDTO.getDescription())
                         .price(saveMealReqDTO.getPrice())
                         .discount(saveMealReqDTO.getDiscount())
@@ -80,7 +99,7 @@ public class MealServiceImpl implements MealService {
 
                 // Update the necessary fields while preserving createdDate
                 existingMealEntity.setName(saveMealReqDTO.getName());
-                existingMealEntity.setImage("https://picsum.photos/seed/1/200/300"); // TODO: Save image to S3
+                existingMealEntity.setImage(fileURL);
                 existingMealEntity.setDescription(saveMealReqDTO.getDescription());
                 existingMealEntity.setPrice(saveMealReqDTO.getPrice());
                 existingMealEntity.setDiscount(saveMealReqDTO.getDiscount());

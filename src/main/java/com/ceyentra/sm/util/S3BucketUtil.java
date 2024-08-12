@@ -66,16 +66,14 @@ public class S3BucketUtil {
             metadata.setContentType(contentType);
             metadata.setCacheControl("no-cache");
 
-//            PutObjectResult putObjectResult = amazonS3Client.putObject(
-//                    new PutObjectRequest(bucketName, fileName, inputStream, metadata)
-//            );
             Upload upload = transferManager.upload(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
             log.info("is upload done: " + upload.isDone());
             upload.waitForCompletion();
             log.info("is upload done: " + upload.isDone());
             log.info("upload info: " + upload.waitForUploadResult().getKey());
 //            return bucketUrl + "/" + fileName;
-            return bucketDomain + "/" + fileName;
+            /*return bucketDomain + "/" + fileName;*/
+            return bucketUrl + fileName;  // Construct the URL using the bucketUrl
         } catch (Exception e) {
             log.info("uploading image failed");
             log.info(e.getMessage());

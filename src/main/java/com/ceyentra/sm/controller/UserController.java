@@ -40,7 +40,6 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody UserDTO userDTO) {
         userService.saveUser(userDTO);
         return new ResponseEntity<>(

@@ -68,20 +68,21 @@ public class UserServiceImpl implements UserService {
             //save user
             userDTO.setId(0L);
             userDTO.setUserStatus(UserStatus.ACTIVE);
+            //set back plain text password to userDTO
+            userDTO.setPassword(password);
             userRepository.save(modelMapper.map(userDTO, UserEntity.class));
 
             //begin email sending..
 
-            //set back plain text password to userDTO
-            userDTO.setPassword(password);
 
-            //send email that contains new account credentials
+
+        /*    //send email that contains new account credentials
             try {
                 emailService.sendUserAccountCredentialsEmail(userDTO);
             } catch (Exception e) {
                 throw new ApplicationServiceException(COMMON_ERROR_CODE, false, "Unable to send user credentials email.");
             }
-
+*/
         } catch (Exception e) {
             log.error("function saveUser : {}", e.getMessage(), e);
             throw e;

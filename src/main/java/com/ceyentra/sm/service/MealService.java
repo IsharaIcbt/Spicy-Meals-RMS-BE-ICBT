@@ -2,6 +2,7 @@ package com.ceyentra.sm.service;
 
 import com.ceyentra.sm.dto.web.request.SaveMealReqDTO;
 import com.ceyentra.sm.dto.web.response.MealResDTO;
+import com.ceyentra.sm.dto.web.response.MealResponseDTO;
 
 import java.util.List;
 
@@ -13,5 +14,5 @@ public interface MealService {
 
     Object findMealById(Long id);
 
-    List<MealResDTO> getAllMeals();
+    List<MealResponseDTO> getAllMeals();
 }

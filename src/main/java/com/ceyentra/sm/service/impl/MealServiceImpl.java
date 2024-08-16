@@ -3,6 +3,7 @@ package com.ceyentra.sm.service.impl;
 import com.ceyentra.sm.dto.web.request.SaveMealReqDTO;
 import com.ceyentra.sm.dto.web.response.MealCommonResDTO;
 import com.ceyentra.sm.dto.web.response.MealResDTO;
+import com.ceyentra.sm.dto.web.response.MealResponseDTO;
 import com.ceyentra.sm.entity.MealEntity;
 import com.ceyentra.sm.entity.RestaurantEntity;
 import com.ceyentra.sm.enums.CommonStatus;
@@ -168,12 +169,12 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public List<MealResDTO> getAllMeals() {
+    public List<MealResponseDTO> getAllMeals() {
         try {
             List<MealEntity> entityList = mealsRepo.findAll();
 
             return entityList.stream().map(mealEntity -> {
-                MealResDTO map = modelMapper.map(mealEntity, MealResDTO.class);
+                MealResponseDTO map = modelMapper.map(mealEntity, MealResponseDTO.class);
                 map.setRestaurantId(mealEntity.getRestaurant().getId());
                 return map;
             }).collect(Collectors.toList());

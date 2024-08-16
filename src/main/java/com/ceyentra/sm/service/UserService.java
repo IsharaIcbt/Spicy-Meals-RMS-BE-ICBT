@@ -1,13 +1,14 @@
 package com.ceyentra.sm.service;
 
 import com.ceyentra.sm.dto.UserDTO;
+import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
 import com.ceyentra.sm.enums.UserStatus;
 
 import java.util.List;
 
 public interface UserService {
 
-    void saveUser(UserDTO userDTO);
+    void saveUser(UserSaveReqDTO userDTO);
 
     List<UserDTO> getAllUsersByStatus(UserStatus status);
 

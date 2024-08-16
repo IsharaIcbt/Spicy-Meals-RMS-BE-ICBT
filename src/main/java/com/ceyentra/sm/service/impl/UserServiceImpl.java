@@ -6,10 +6,14 @@ package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.UserOTPDTO;
+import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
 import com.ceyentra.sm.entity.UserEntity;
+import com.ceyentra.sm.enums.UserRole;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.exception.UserException;
+import com.ceyentra.sm.repository.AdminRepo;
+import com.ceyentra.sm.repository.StaffRepo;
 import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.service.UserOTPService;
@@ -17,6 +21,7 @@ import com.ceyentra.sm.service.UserService;
 import com.ceyentra.sm.util.EmailValidator;
 import com.ceyentra.sm.util.OTPGenerator;
 import com.ceyentra.sm.util.PasswordGenerator;
+import com.ceyentra.sm.util.S3BucketUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -24,6 +29,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,49 +49,48 @@ public class UserServiceImpl implements UserService {
     private final PasswordGenerator passwordGenerator;
     private final OTPGenerator OTPGenerator;
     private final EmailService emailService;
+    private final AdminRepo adminRepo;
+    private final StaffRepo staffRepo;
+    private final UserRepo userRepo;
+    private final S3BucketUtil s3BucketUtil;
 
     @Override
-    public void saveUser(UserDTO userDTO) {
+    public void saveUser(UserSaveReqDTO userDTO) {
         log.info("Start function saveUser @Param userDTO : {}", userDTO);
         try {
-
-            //check given email is already taken
-            Optional<UserEntity> userEntityByEmail = userRepository.findUserEntityByEmail(userDTO.getEmail());
-            if (userDTO.getEmail() != null && (userEntityByEmail.isPresent() && (userEntityByEmail.get().getStatus() != UserStatus.DELETED)))
-                throw new UserException(EMAILS_ARE_SAME, false, "The email you provided already exists. Please choose a different email.");
-
             //validate email
-            if (!(userDTO.getEmail() != null && emailValidator.isValidEmail(userDTO.getEmail())))
+            if (userDTO.getEmail() == null || userDTO.getEmail().isEmpty() || !emailValidator.isValidEmail(userDTO.getEmail()))
                 throw new UserException(INVALID_EMAIL, false, "Please enter a valid email address.");
 
-            //generating a new password
-            String password = passwordGenerator.generatePassword(8);
+            validateUniqueEmail(userDTO.getEmail());
 
-            //encode the password and set back to UserDTO
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            userDTO.setPassword(bCryptPasswordEncoder.encode(password));
+            userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
 
-            //save user
-            userDTO.setId(0L);
-            userDTO.setUserStatus(UserStatus.ACTIVE);
-            //set back plain text password to userDTO
-            userDTO.setPassword(password);
-            userRepository.save(modelMapper.map(userDTO, UserEntity.class));
+            // Initialize fileURL variable
+            String fileURL = null;
+            MultipartFile file = userDTO.getImgFile();
 
-            //begin email sending..
-
-
-
-        /*    //send email that contains new account credentials
-            try {
-                emailService.sendUserAccountCredentialsEmail(userDTO);
-            } catch (Exception e) {
-                throw new ApplicationServiceException(COMMON_ERROR_CODE, false, "Unable to send user credentials email.");
+            // Only attempt to upload the file if it is not null
+            if (file != null && !file.isEmpty()) {
+                fileURL = s3BucketUtil.uploadMultipartToS3bucket(MEALS_S3_BUCKET_FOLDER + s3BucketUtil.generateFileName(file), file);
             }
-*/
+
+            UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);
+            userEntity.setId(0L);
+            userEntity.setImg(fileURL);
+            userEntity.setUserRole(UserRole.CUSTOMER);
+            userRepository.save(userEntity);
+
         } catch (Exception e) {
             log.error("function saveUser : {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private void validateUniqueEmail(String email) {
+        if (adminRepo.findByEmail(email).isPresent() || staffRepo.findByEmail(email).isPresent() || userRepo.findByEmail(email).isPresent()) {
+            throw new ApplicationServiceException(200, false, "Email is already in use");
         }
     }
 

@@ -5,6 +5,7 @@ import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.UserPasswordResetRequestDTO;
+import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
 import com.ceyentra.sm.dto.web.request.ValidateUserOTPRequestDTO;
 import com.ceyentra.sm.dto.web.response.UserResponseDTO;
 import com.ceyentra.sm.enums.UserStatus;
@@ -40,7 +41,7 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<CommonResponseDTO> registerUser(@ModelAttribute UserSaveReqDTO userDTO) {
         userService.saveUser(userDTO);
         return new ResponseEntity<>(
                 CommonResponseDTO.builder()

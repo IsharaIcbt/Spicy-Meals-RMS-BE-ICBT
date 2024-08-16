@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,5 +137,9 @@ public class S3BucketUtil {
             log.info(e.getMessage(), e);
             throw new ApplicationServiceException(200,false, "static files load failed");
         }
+    }
+
+    public String generateFileName(MultipartFile multiPart) {
+        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
     }
 }

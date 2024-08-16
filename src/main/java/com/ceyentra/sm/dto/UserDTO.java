@@ -28,7 +28,8 @@ public class UserDTO {
     private String homeAddress;
     private UserRole userRole;
     private Date createdDate;
-    private UserStatus userStatus;
+    private Date updatedDate;
+    UserStatus status;
 }
 
 

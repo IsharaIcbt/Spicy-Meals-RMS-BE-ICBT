@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.ceyentra.sm.constant.ApplicationConstant.MEALS_S3_BUCKET_FOLDER;
 
@@ -103,7 +104,7 @@ public class MealServiceImpl implements MealService {
                 MealEntity existingMealEntity = byId.get();
 
                 // If fileURL is null, retain the existing image URL
-                if (fileURL == null){
+                if (fileURL == null) {
                     fileURL = existingMealEntity.getImage();
                 }
 
@@ -164,5 +165,22 @@ public class MealServiceImpl implements MealService {
                 .createdDate(meal.getCreatedDate())
                 .updatedDate(meal.getUpdatedDate())
                 .build();
+    }
+
+    @Override
+    public List<MealResDTO> getAllMeals() {
+        try {
+            List<MealEntity> entityList = mealsRepo.findAll();
+
+            return entityList.stream().map(mealEntity -> {
+                MealResDTO map = modelMapper.map(mealEntity, MealResDTO.class);
+                map.setRestaurantId(mealEntity.getRestaurant().getId());
+                return map;
+            }).collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
+        }
     }
 }

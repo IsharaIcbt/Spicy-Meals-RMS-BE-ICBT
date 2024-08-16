@@ -80,6 +80,7 @@ public class UserServiceImpl implements UserService {
             userEntity.setId(0L);
             userEntity.setImg(fileURL);
             userEntity.setUserRole(UserRole.CUSTOMER);
+            userEntity.setStatus(UserStatus.ACTIVE);
             userRepository.save(userEntity);
 
         } catch (Exception e) {

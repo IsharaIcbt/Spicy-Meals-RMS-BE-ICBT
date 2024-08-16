@@ -34,6 +34,8 @@ public class MealOrderDetail {
 
     Float discount;
 
+    Float qty;
+
     @Column(name = "created_date")
     @CreationTimestamp
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")

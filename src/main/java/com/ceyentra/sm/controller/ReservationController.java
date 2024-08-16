@@ -1,5 +1,7 @@
 package com.ceyentra.sm.controller;
 
+import com.ceyentra.sm.dto.common.CommonResponseDTO;
+import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
 import com.ceyentra.sm.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,15 @@ public class ReservationController {
     @PostMapping("/table")
     public ResponseEntity<Object> saveTableReservation(@RequestBody TableReservationReqDTO reqDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(reservationService.saveTableReservation(reqDTO));
+    }
+
+    @PostMapping("/meal")
+    public ResponseEntity<Object> saveMealOrder(@RequestBody MealOrderReqDTO reqDTO) {
+        reservationService.saveMealOrder(reqDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
+                .success(true)
+                .message("Saved meal order")
+                .build());
     }
 
 }

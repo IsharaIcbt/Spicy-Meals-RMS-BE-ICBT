@@ -6,6 +6,7 @@ import com.ceyentra.sm.dto.web.response.QueryResDTO;
 import com.ceyentra.sm.entity.*;
 import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.QueryType;
+import com.ceyentra.sm.enums.UserRole;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.repository.*;
@@ -51,7 +52,7 @@ public class QueryServiceImpl implements QueryService {
                 case STAFF:
                     Optional<StaffEntity> staffEntity = staffRepo.findStaffEntityByIdAndStatus(saveQueryReqDTO.getUserId(), CommonStatus.ACTIVE);
                     if (!staffEntity.isPresent()) {
-                        throw new ApplicationServiceException(200, false, "Admin does not exist");
+                        throw new ApplicationServiceException(200, false, "Staff does not exist");
                     }
                     queryEntity.setStaff(staffEntity.get());
                     break;
@@ -59,7 +60,7 @@ public class QueryServiceImpl implements QueryService {
                 case CUSTOMER:
                     Optional<UserEntity> userEntity = userRepo.findUserEntityByIdAndStatus(saveQueryReqDTO.getUserId(), UserStatus.ACTIVE);
                     if (!userEntity.isPresent()) {
-                        throw new ApplicationServiceException(200, false, "Admin does not exist");
+                        throw new ApplicationServiceException(200, false, "Customer does not exist");
                     }
                     queryEntity.setUser(userEntity.get());
                     break;
@@ -91,13 +92,16 @@ public class QueryServiceImpl implements QueryService {
                     break;
 
                 case CUSTOM:
-                    Optional<UserEntity> userEntity = userRepo.findById(saveQueryReqDTO.getRepliedTo());
 
-                    if (!userEntity.isPresent()) {
-                        throw new ApplicationServiceException(200, false, "Customer does not exist");
+                    if(!saveQueryReqDTO.getUserRole().equals(UserRole.CUSTOMER)){
+                        Optional<UserEntity> userEntity = userRepo.findById(saveQueryReqDTO.getRepliedTo());
+
+                        if (!userEntity.isPresent()) {
+                            throw new ApplicationServiceException(200, false, "Customer does not exist");
+                        }
+
+                        queryEntity.setUser(userEntity.get());
                     }
-
-                    queryEntity.setUser(userEntity.get());
                     break;
 
                 default:

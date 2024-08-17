@@ -811,7 +811,7 @@ public class EmailTemplateConstant {
                 "                                                               style=\"text-decoration: none;\" target=\"_self\"><img\n" +
                 "                                                                    align=\"center\" alt=\"new year celebration\"\n" +
                 "                                                                    class=\"icon\" height=\"64\"\n" +
-                "                                                                    src=\"https://jkl.ceyentra.lk/srs/templateresources/jkl-logo.png\"\n" +
+                "                                                                    src=\"https://imagesofspicymeals.s3.ap-south-1.amazonaws.com/upload/logo.png\"\n" +
                 "                                                                    style=\"display: block; height: auto; margin: 0 auto; border: 0;\"\n" +
                 "                                                                    width=\"49\"/></a></td>\n" +
                 "                                                    </tr>\n" +
@@ -825,7 +825,7 @@ public class EmailTemplateConstant {
                 "                                        <tr>\n" +
                 "                                            <td class=\"pad\" style=\"padding-top:10px;text-align:center;width:100%;\">\n" +
                 "                                                <h1 style=\"margin: 0; color: #1a2028; direction: ltr; font-family: 'Roboto', Tahoma, Verdana, Segoe, sans-serif; font-size: 36px; font-weight: 700; letter-spacing: 1px; line-height: 120%; text-align: center; margin-top: 0; margin-bottom: 0;\">\n" +
-                "                                                    <span class=\"tinyMce-placeholder\">John Keells PLC</span></h1>\n" +
+                "                                                    <span class=\"tinyMce-placeholder\">Spicy Meals Restaurant</span></h1>\n" +
                 "                                            </td>\n" +
                 "                                        </tr>\n" +
                 "                                    </table>\n" +
@@ -850,7 +850,7 @@ public class EmailTemplateConstant {
                 "                                        <tr>\n" +
                 "                                            <td class=\"pad\" style=\"width:100%;padding-right:0px;padding-left:0px;\">\n" +
                 "                                                <div align=\"center\" class=\"alignment\" style=\"line-height:10px\"><img\n" +
-                "                                                        src=\"https://jkl.ceyentra.lk/srs/templateresources/forgot-password.png\"\n" +
+                "                                                        src=\"https://imagesofspicymeals.s3.ap-south-1.amazonaws.com/upload/pawd.png\"\n" +
                 "                                                        style=\"display: block; height: auto; border: 0; max-width: 239px; width: 100%;\"\n" +
                 "                                                        width=\"239\"/></div>\n" +
                 "                                            </td>\n" +
@@ -862,7 +862,7 @@ public class EmailTemplateConstant {
                 "                                        <tr>\n" +
                 "                                            <td class=\"pad\">\n" +
                 "                                                <h3 style=\"margin: 0; color: #88b44e; direction: ltr; font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: normal; line-height: 150%; text-align: center; margin-top: 0; margin-bottom: 0;\">\n" +
-                "                                                    <img src=\"https://jkl.ceyentra.lk/srs/templateresources/icon-lock.png\" style=\"margin-bottom: -2px;\" /> Forget Password Pin</h3>\n" +
+//                "                                                    <img src=\"https://imagesofspicymeals.s3.ap-south-1.amazonaws.com/upload/lock+(1).png\" style=\"margin-bottom: -2px;\" /> Forget Password Pin</h3>\n" +
                 "                                            </td>\n" +
                 "                                        </tr>\n" +
                 "                                    </table>\n" +

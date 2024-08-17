@@ -5,14 +5,18 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.UserDTO;
-import com.ceyentra.sm.dto.UserOTPDTO;
 import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
+import com.ceyentra.sm.entity.AdminEntity;
+import com.ceyentra.sm.entity.EmailPasswordResetOTPEntity;
+import com.ceyentra.sm.entity.StaffEntity;
 import com.ceyentra.sm.entity.UserEntity;
+import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.UserRole;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.exception.UserException;
 import com.ceyentra.sm.repository.AdminRepo;
+import com.ceyentra.sm.repository.EmailPasswordResetOTPRepo;
 import com.ceyentra.sm.repository.StaffRepo;
 import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.EmailService;
@@ -53,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private final StaffRepo staffRepo;
     private final UserRepo userRepo;
     private final S3BucketUtil s3BucketUtil;
+    private final EmailPasswordResetOTPRepo emailPasswordResetOTPRepo;
 
     @Override
     public void saveUser(UserSaveReqDTO userDTO) {
@@ -247,23 +252,36 @@ public class UserServiceImpl implements UserService {
     public void sendUserOTP(String email) {
         log.info("class : {} function sendUserOTP @Param email :  {}", getClass().getName(), email);
         try {
-
-            //check user if exists with provided email(call to the service method)
-            UserDTO userByEmail = findUserByEmail(email);
+//            Optional<AdminEntity> admin = adminRepo.findByEmail(email);
+//
+//            Optional<UserEntity> customer = userRepository.findByEmail(email);
+//
+//            Optional<StaffEntity> staff = staffRepo.findByEmail(email);
+//
+//            if ((!admin.isPresent() || !admin.get().getStatus().equals(CommonStatus.ACTIVE)) &&
+//                    (!customer.isPresent() || !customer.get().getStatus().equals(UserStatus.ACTIVE)) &&
+//                    (!staff.isPresent() || !staff.get().getStatus().equals(CommonStatus.ACTIVE))) {
+//                throw new UserException(USER_NOT_FOUND, false,
+//                        "Sorry, user not found. Please check the email and try again.");
+//            }
 
             //generate OTP
             int OTP = OTPGenerator.generateOTP();
 
-            //save user with OTP
-            userOTPService.addUserOTP(UserOTPDTO.builder()
-                    .userDTO(userByEmail)
-                    .OTP(OTP)
-                    .build()
-            );
+            EmailPasswordResetOTPEntity otpEntity = EmailPasswordResetOTPEntity.builder()
+                    .otp(String.valueOf(OTP))
+                    .email(email)
+                    .build();
+
+            emailPasswordResetOTPRepo.deleteAll(emailPasswordResetOTPRepo.findEmailPasswordResetOTPEntitiesByEmail(email));
+
+            emailPasswordResetOTPRepo.save(otpEntity);
 
             //send email to the user that contains OTP
             try {
-                emailService.sendUserOTPEmail(userByEmail, OTP);
+                emailService.sendUserOTPEmail(UserDTO.builder()
+                        .email(email)
+                        .build(), OTP);
             } catch (Exception e) {
                 throw new ApplicationServiceException(COMMON_ERROR_CODE, false, "Unable to the send OTP");
             }

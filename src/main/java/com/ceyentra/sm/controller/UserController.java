@@ -1,7 +1,6 @@
 package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.config.throttling_config.Throttling;
-import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.UserPasswordResetRequestDTO;
@@ -63,7 +62,7 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-   /* @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")*/
+    /* @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")*/
     public ResponseEntity<ResponseDTO<Object>> getAllUsers(
             @RequestParam(value = "key", required = false) String key,
             @RequestParam(value = "value", required = false) String value) {
@@ -211,12 +210,12 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 10)
     @PostMapping(value = "otp/validate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponseDTO> validateUserOTP(@RequestBody ValidateUserOTPRequestDTO requestDTO) {
+    public ResponseEntity<Object> validateUserOTP(@RequestBody ValidateUserOTPRequestDTO requestDTO) {
         userOTPService.validateUserOTP(requestDTO.getEmail(), requestDTO.getOtp());
         return new ResponseEntity<>(
-                CommonResponseDTO.builder()
+                ResponseDTO.builder()
                         .success(true)
-                        .message("Your OTP has been successfully verified.")
+                        .data(requestDTO)
                         .build()
                 , HttpStatus.OK);
     }

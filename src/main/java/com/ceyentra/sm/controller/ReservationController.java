@@ -1,8 +1,12 @@
 package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
+import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
+import com.ceyentra.sm.dto.web.request.SaveQueryReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
+import com.ceyentra.sm.enums.QueryType;
+import com.ceyentra.sm.service.QueryService;
 import com.ceyentra.sm.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final QueryService queryService;
 
     @PostMapping("/table")
     public ResponseEntity<Object> saveTableReservation(@RequestBody TableReservationReqDTO reqDTO) {
@@ -28,6 +33,23 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
                 .success(true)
                 .message("Saved meal order")
+                .build());
+    }
+
+    @PostMapping("/query")
+    public ResponseEntity<Object> saveQuery(@RequestBody SaveQueryReqDTO reqDTO) {
+        queryService.save(reqDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
+                .success(true)
+                .message("Saved query")
+                .build());
+    }
+
+    @PostMapping("/query/{type}/{orderId}")
+    public ResponseEntity<Object> getQueries(@PathVariable QueryType type, @PathVariable Long orderId) {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
+                .success(true)
+                .data(queryService.getQueries(type, orderId))
                 .build());
     }
 

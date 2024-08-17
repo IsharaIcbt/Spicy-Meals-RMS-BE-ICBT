@@ -4,6 +4,7 @@
  */
 package com.ceyentra.sm.service.impl;
 
+import com.ceyentra.sm.constant.ApplicationConstant;
 import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
 import com.ceyentra.sm.entity.AdminEntity;
@@ -15,6 +16,7 @@ import com.ceyentra.sm.enums.UserRole;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.exception.UserException;
+import com.ceyentra.sm.exception.UserOTPException;
 import com.ceyentra.sm.repository.AdminRepo;
 import com.ceyentra.sm.repository.EmailPasswordResetOTPRepo;
 import com.ceyentra.sm.repository.StaffRepo;
@@ -217,14 +219,36 @@ public class UserServiceImpl implements UserService {
     public void resetUserPassword(String email, int OTP, String password) {
         log.info("starting resetUserPassword @Param email : {} OTP : {} password : {}", email, OTP, password);
         try {
+            Optional<EmailPasswordResetOTPEntity> byEmailAndOtp = emailPasswordResetOTPRepo.findEmailPasswordResetOTPEntitiesByEmailAndOtp(email, String.valueOf(OTP));
 
-            //validate email and OTP
-            userOTPService.validateUserOTP(email, OTP);
+            if (!byEmailAndOtp.isPresent())
+                throw new UserOTPException(ApplicationConstant.INVALID_OTP, false, "OTP verification failed.");
 
-            //check user is exists with given email(directly call to the service method)
-            UserDTO userByEmail = findUserByEmail(email);
+            Optional<AdminEntity> admin = adminRepo.findByEmail(email);
 
-            resetUserPassword(userByEmail.getId(), password, false);
+            if (admin.isPresent() && admin.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                admin.get().setPassword(bCryptPasswordEncoder.encode(password));
+                adminRepo.save(admin.get());
+                return;
+            }
+
+            Optional<UserEntity> customer = userRepository.findByEmail(email);
+
+            if (customer.isPresent() && customer.get().getStatus().equals(UserStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                customer.get().setPassword(bCryptPasswordEncoder.encode(password));
+                userRepo.save(customer.get());
+                return;
+            }
+
+            Optional<StaffEntity> staff = staffRepo.findByEmail(email);
+
+            if (staff.isPresent() && staff.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                staff.get().setPassword(bCryptPasswordEncoder.encode(password));
+                staffRepo.save(staff.get());
+            }
 
         } catch (Exception e) {
             log.error("function resetUserPassword(email,OTP,password) : {}", e.getMessage(), e);

@@ -130,6 +130,7 @@ public class QueryServiceImpl implements QueryService {
                     }
 
                     queryEntities = queryRepo.findAllByMealOrder_IdOrderByCreatedDate(id);
+                    break;
 
                 case TABLE:
                     Optional<TableReservationEntity> tableReservationEntity = tableReservationRepo.findById(id);

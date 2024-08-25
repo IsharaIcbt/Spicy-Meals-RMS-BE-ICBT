@@ -15,4 +15,5 @@ public class MealOrderReqDTO {
     boolean isDiffAddress;
     MealOrderType orderType;
     ArrayList<MealOrderItemReq> items = new ArrayList<>();
+    MealOrderAddress address;
 }

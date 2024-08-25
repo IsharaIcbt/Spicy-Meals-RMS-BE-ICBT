@@ -97,7 +97,7 @@ public class ReservationServiceImpl implements ReservationService {
             }
 
             //check restaurant
-            Optional<RestaurantEntity> restaurant = restaurantRepo.findById(mealOrderDTO.getRestaurantId());
+            Optional<RestaurantEntity> restaurant = restaurantRepo.findById(mealOrderDTO.getAddress().getRestaurantId());
 
             if (!restaurant.isPresent() || !restaurant.get().getStatus().equals(CommonStatus.ACTIVE)) {
                 throw new ApplicationServiceException(200, false, "Restaurant not found!");
@@ -105,11 +105,15 @@ public class ReservationServiceImpl implements ReservationService {
 
             MealOrderEntity mealOrder = MealOrderEntity.builder()
                     .orderId("M/" + UUID.randomUUID())
-                    .mealOrderType(mealOrderDTO.getOrderType())
+                    .mealOrderType(MealOrderType.ONLINE)
                     .operationalStatus(MealOperationalStatus.NEW)
                     .userEntity(customer.get())
                     .restaurant(restaurant.get())
                     .status(CommonStatus.ACTIVE)
+                    .deliveryAddress(mealOrderDTO.getAddress().getAddress())
+                    .fullName(mealOrderDTO.getAddress().getFullName())
+                    .mobileNumber(mealOrderDTO.getAddress().getMobileNumber())
+                    .paymentStatus(PaymentStatus.NOT_PAID)
                     .build();
 
             MealOrderEntity savedMealOrder = mealOrderRepo.save(mealOrder);

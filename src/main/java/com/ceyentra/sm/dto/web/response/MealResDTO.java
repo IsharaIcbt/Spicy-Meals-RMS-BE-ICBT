@@ -21,6 +21,7 @@ public class MealResDTO {
     String image;
     String description;
     Float price;
+    Float qty;
     Float discount;
     Long rating;
     MealTypes subCategory;

@@ -66,6 +66,8 @@ public class CustomTokenEnhancer extends JwtAccessTokenConverter {
                     .name(customer.get().getName())
                     .userRole(customer.get().getUserRole())
                     .img(customer.get().getImg())
+                    .homeAddress(customer.get().getHomeAddress())
+                    .phoneNumber(customer.get().getPhoneNumber())
                     .build();
             additionalInfo.put("user", build);
         }

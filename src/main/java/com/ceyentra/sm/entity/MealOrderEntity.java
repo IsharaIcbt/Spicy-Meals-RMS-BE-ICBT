@@ -3,6 +3,7 @@ package com.ceyentra.sm.entity;
 import com.ceyentra.sm.enums.CommonStatus;
 import com.ceyentra.sm.enums.MealOperationalStatus;
 import com.ceyentra.sm.enums.MealOrderType;
+import com.ceyentra.sm.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,19 @@ public class MealOrderEntity {
 
     @Column(name = "order_code", unique = true)
     String orderId;
+
+    @Column(name = "delivery_address")
+    String deliveryAddress;
+
+    @Column(name = "full_name")
+    String fullName;
+
+    @Column(name = "mobile_number")
+    String mobileNumber;
+
+    @Column(name = "payment_status")
+    @Enumerated(EnumType.STRING)
+    PaymentStatus paymentStatus;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "operational_status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'NEW'")

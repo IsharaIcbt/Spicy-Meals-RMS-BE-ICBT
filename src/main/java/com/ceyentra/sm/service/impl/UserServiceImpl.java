@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
             // Only attempt to upload the file if it is not null
             if (file != null && !file.isEmpty()) {
-                fileURL = s3BucketUtil.uploadMultipartToS3bucket(MEALS_S3_BUCKET_FOLDER + s3BucketUtil.generateFileName(file), file);
+                fileURL = s3BucketUtil.uploadMultipartToS3bucket(USERS_S3_BUCKET_FOLDER + s3BucketUtil.generateFileName(file), file);
             }
 
             UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);

@@ -10,6 +10,7 @@ public class ApplicationConstant {
 
     /*s3 bucket meal images path */
     public static final String MEALS_S3_BUCKET_FOLDER = "meals/";
+    public static final String USERS_S3_BUCKET_FOLDER = "users/";
     public static final String FACILITY_S3_BUCKET_FOLDER = "facility/";
 
     public static final String API_BASE_URL = "/v1";

@@ -36,6 +36,14 @@ public class ReservationController {
                 .build());
     }
 
+    @GetMapping("/{type}/{orderId}")
+    public ResponseEntity<Object> getReservations(@PathVariable QueryType type, @PathVariable Long orderId) {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
+                .success(true)
+                .data(queryService.getQueries(type, orderId))
+                .build());
+    }
+
     @PostMapping("/query")
     public ResponseEntity<Object> saveQuery(@RequestBody SaveQueryReqDTO reqDTO) {
         queryService.save(reqDTO);
@@ -45,11 +53,11 @@ public class ReservationController {
                 .build());
     }
 
-    @GetMapping("/query/{type}/{orderId}")
-    public ResponseEntity<Object> getQueries(@PathVariable QueryType type, @PathVariable Long orderId) {
+    @GetMapping("/query/{type}/{userId}")
+    public ResponseEntity<Object> getQueries(@PathVariable QueryType type, @PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
                 .success(true)
-                .data(queryService.getQueries(type, orderId))
+                .data(queryService.getQueries(type, userId))
                 .build());
     }
 

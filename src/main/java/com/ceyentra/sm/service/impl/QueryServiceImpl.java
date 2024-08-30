@@ -93,7 +93,7 @@ public class QueryServiceImpl implements QueryService {
 
                 case CUSTOM:
 
-                    if(!saveQueryReqDTO.getUserRole().equals(UserRole.CUSTOMER)){
+                    if (!saveQueryReqDTO.getUserRole().equals(UserRole.CUSTOMER)) {
                         Optional<UserEntity> userEntity = userRepo.findById(saveQueryReqDTO.getRepliedTo());
 
                         if (!userEntity.isPresent()) {
@@ -121,7 +121,7 @@ public class QueryServiceImpl implements QueryService {
     }
 
     @Override
-    public List<QueryResDTO>  getQueries(QueryType type, Long id) {
+    public List<QueryResDTO> getQueries(QueryType type, Long id) {
         try {
             List<QueryEntity> queryEntities = new ArrayList<>();
 
@@ -153,20 +153,20 @@ public class QueryServiceImpl implements QueryService {
 
             return queryEntities.stream().map(queryEntity -> QueryResDTO.builder()
                     .id(queryEntity.getId())
-                    .mealOrder(queryEntity.getMealOrder().getId())
-                    .tableReservation(queryEntity.getTableReservation().getId())
+                    .mealOrder(queryEntity.getMealOrder() == null ? null : queryEntity.getMealOrder().getId())
+                    .tableReservation(queryEntity.getTableReservation() == null ? null : queryEntity.getTableReservation().getId())
                     .queryType(queryEntity.getQueryType())
                     .message(queryEntity.getMessage())
-                    .user(UserDTO.builder()
+                    .user(queryEntity.getUser() == null ? null : UserDTO.builder()
                             .id(queryEntity.getUser().getId())
                             .name(queryEntity.getUser().getName())
                             .img(queryEntity.getUser().getImg())
                             .build())
-                    .admin(UserDTO.builder()
+                    .admin(queryEntity.getAdmin() == null ? null : UserDTO.builder()
                             .id(queryEntity.getAdmin().getId())
                             .name(queryEntity.getAdmin().getName())
                             .build())
-                    .staff(UserDTO.builder()
+                    .staff(queryEntity.getStaff() == null ? null : UserDTO.builder()
                             .id(queryEntity.getStaff().getId())
                             .name(queryEntity.getStaff().getName())
                             .build())

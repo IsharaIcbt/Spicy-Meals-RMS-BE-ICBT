@@ -85,6 +85,14 @@ public class ReservationController {
                 .build());
     }
 
+    @GetMapping("/by-order/{type}/{orderId}")
+    public ResponseEntity<Object> getReservationsByTypeAndId(@PathVariable QueryType type, @PathVariable Long orderId) {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
+                .success(true)
+                .data(reservationService.getReservationsByTypeAndId(type, orderId))
+                .build());
+    }
+
     @GetMapping("/payment/session")
     public String makeCheckoutSession() throws StripeException {
         try {

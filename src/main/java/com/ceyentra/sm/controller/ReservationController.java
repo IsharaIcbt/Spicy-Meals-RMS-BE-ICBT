@@ -77,7 +77,7 @@ public class ReservationController {
                 .build());
     }
 
-    @GetMapping("/{type}/{userId}")
+    @GetMapping("/order/{type}/{userId}")
     public ResponseEntity<Object> getReservationsByType(@PathVariable QueryType type, @PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
                 .success(true)

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -162,9 +163,12 @@ public class ReservationServiceImpl implements ReservationService {
                     reservationResDTOS = mealOrderRepo.findByUserEntityId(id).stream().map(mealOrderEntity -> {
                         List<MealOrderDetail> byMealOrderId = mealOrderDetailRepo.findByMealOrderId(mealOrderEntity.getId());
 
+                        AtomicReference<Double> total = new AtomicReference<>((double) 0);
+
                         List<MealResDTO> items = byMealOrderId.stream().map(mealOrderDetail -> {
                             MealResDTO dto = modelMapper.map(mealOrderDetail.getMeal(), MealResDTO.class);
                             dto.setQty(mealOrderDetail.getQty());
+                            total.updateAndGet(v -> v + mealOrderDetail.getPrice() * mealOrderDetail.getQty());
                             return dto;
                         }).collect(Collectors.toList());
 
@@ -181,6 +185,7 @@ public class ReservationServiceImpl implements ReservationService {
                                         .updatedDate(mealOrderEntity.getUpdatedDate())
                                         .build())
                                 .items(items)
+                                .total(total.get())
                                 .queries(queryService.getQueries(QueryType.MEAL, mealOrderEntity.getId()))
                                 .build();
                     }).collect(Collectors.toList());

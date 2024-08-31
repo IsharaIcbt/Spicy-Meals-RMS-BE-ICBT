@@ -26,5 +26,6 @@ public class MealReservationResDTO {
     Long restaurant;
     Date createdDate;
     Date updatedDate;
+    Double total;
     List<MealResDTO> items;
 }

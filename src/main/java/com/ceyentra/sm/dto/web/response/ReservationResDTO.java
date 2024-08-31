@@ -13,7 +13,6 @@ import java.util.List;
 @Builder
 public class ReservationResDTO<T,S> {
     T reservation;
-    Double total;
     List<S> items;
     List<QueryResDTO> queries;
 }

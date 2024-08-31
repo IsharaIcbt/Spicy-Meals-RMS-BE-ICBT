@@ -12,6 +12,6 @@ public interface TableReservationRepo extends JpaRepository<TableReservationEnti
 
     List<TableReservationEntity> findTableReservationEntityByCustomerId(Long id);
 
-    @Query("FROM TableReservationEntity WHERE TableReservationEntity.id=:id")
+    @Query(value = "SELECT tables_reservation.* FROM tables_reservation WHERE tables_reservation.id=:?1", nativeQuery = true)
     List<TableReservationEntity> findByIdV2(Long id);
 }

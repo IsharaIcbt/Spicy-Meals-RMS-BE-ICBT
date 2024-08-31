@@ -10,6 +10,6 @@ public interface MealOrderRepo extends JpaRepository<MealOrderEntity, Long> {
 
     List<MealOrderEntity> findByUserEntityId(Long id);
 
-    @Query("FROM MealOrderEntity WHERE MealOrderEntity.id=:id")
+    @Query(value = "SELECT meal_order.* FROM meal_order WHERE meal_order.id=:?1", nativeQuery = true)
     List<MealOrderEntity> findByIdV2(Long id);
 }

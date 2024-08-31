@@ -133,7 +133,7 @@ public class ReservationServiceImpl implements ReservationService {
                     return MealOrderDetail.builder()
                             .meal(meal.get())
                             .qty(item.getQty())
-                            .price(meal.get().getPrice())
+                            .price(meal.get().getDiscount() == null ? meal.get().getPrice() : meal.get().getPrice() - meal.get().getDiscount())
                             .discount(meal.get().getDiscount())
                             .mealOrder(savedMealOrder)
                             .build();
@@ -175,6 +175,7 @@ public class ReservationServiceImpl implements ReservationService {
                         return ReservationResDTO.<MealReservationResDTO, MealResDTO>builder()
                                 .reservation(MealReservationResDTO.builder()
                                         .id(mealOrderEntity.getId())
+                                        .total(total.get())
                                         .orderId(mealOrderEntity.getOrderId())
                                         .operationalStatus(mealOrderEntity.getOperationalStatus())
                                         .status(mealOrderEntity.getStatus())
@@ -185,7 +186,6 @@ public class ReservationServiceImpl implements ReservationService {
                                         .updatedDate(mealOrderEntity.getUpdatedDate())
                                         .build())
                                 .items(items)
-                                .total(total.get())
                                 .queries(queryService.getQueries(QueryType.MEAL, mealOrderEntity.getId()))
                                 .build();
                     }).collect(Collectors.toList());

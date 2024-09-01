@@ -3,6 +3,7 @@ package com.ceyentra.sm.controller;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
+import com.ceyentra.sm.dto.web.request.ReservationApproveReqDTO;
 import com.ceyentra.sm.dto.web.request.SaveQueryReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
 import com.ceyentra.sm.enums.QueryType;
@@ -98,6 +99,15 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
                 .success(true)
                 .data(reservationService.getAllReservations(type))
+                .build());
+    }
+
+    @PatchMapping("/{orderId}")
+    public ResponseEntity<Object> updateReservationOperationalStatus(@PathVariable Long orderId, @RequestBody ReservationApproveReqDTO reqDTO) {
+        reservationService.updateReservationOperationalStatus(orderId, reqDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
+                .success(true)
+                .message("Updated order status successfully.")
                 .build());
     }
 

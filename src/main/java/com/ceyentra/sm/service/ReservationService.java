@@ -14,4 +14,6 @@ public interface ReservationService {
     Object getReservationsByType(QueryType type, Long id);
 
     Object getReservationsByTypeAndId(QueryType type, Long id);
+
+    Object getAllReservations(QueryType type);
 }

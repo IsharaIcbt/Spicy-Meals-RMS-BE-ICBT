@@ -1,6 +1,7 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
+import com.ceyentra.sm.dto.web.request.ReservationApproveReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
 import com.ceyentra.sm.dto.web.response.*;
 import com.ceyentra.sm.entity.*;
@@ -16,10 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -396,6 +394,42 @@ public class ReservationServiceImpl implements ReservationService {
 
         } catch (Exception e) {
             log.error("Error while saving table reservation", e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void updateReservationOperationalStatus(Long id, ReservationApproveReqDTO reqDTO) {
+        try {
+            log.info("start function updateReservationOperationalStatus @params id: {}, reqDTO: {}", id, reqDTO);
+            switch (reqDTO.getType()) {
+                case MEAL:
+                    Optional<MealOrderEntity> mealOrderEntity = mealOrderRepo.findById(id);
+
+                    if (!mealOrderEntity.isPresent() || !mealOrderEntity.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                        throw new ApplicationServiceException(200, false, "Meal order does not exist");
+                    }
+
+                    mealOrderEntity.get().setOperationalStatus(reqDTO.getMStatus());
+                    mealOrderEntity.get().setUpdatedDate(new Date());
+                    mealOrderRepo.save(mealOrderEntity.get());
+                    break;
+
+                case TABLE:
+                    Optional<TableReservationEntity> tableReservation = tableReservationRepo.findById(id);
+
+                    if (!tableReservation.isPresent() || !tableReservation.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                        throw new ApplicationServiceException(200, false, "Meal order does not exist");
+                    }
+
+                    tableReservation.get().setOperationalStatus(reqDTO.getTStatus());
+                    tableReservation.get().setUpdatedDate(new Date());
+                    tableReservation.get().setApprovedNote(reqDTO.getNote());
+                    tableReservationRepo.save(tableReservation.get());
+                    break;
+            }
+        } catch (Exception e) {
+            log.error(e);
             throw e;
         }
     }

@@ -140,7 +140,7 @@ public class QueryServiceImpl implements QueryService {
                     Optional<TableReservationEntity> tableReservationEntity = tableReservationRepo.findById(id);
 
                     if (!tableReservationEntity.isPresent()) {
-                        throw new ApplicationServiceException(200, false, "Meal order does not exist");
+                        throw new ApplicationServiceException(200, false, "Table reservation does not exist");
                     }
 
                     queryEntities = queryRepo.findAllByTableReservation_IdOrderByCreatedDate(id);

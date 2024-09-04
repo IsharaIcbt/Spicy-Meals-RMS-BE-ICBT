@@ -1,5 +1,6 @@
 package com.ceyentra.sm.service.impl;
 
+import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
 import com.ceyentra.sm.dto.web.request.ReservationApproveReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
@@ -8,6 +9,7 @@ import com.ceyentra.sm.entity.*;
 import com.ceyentra.sm.enums.*;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.repository.*;
+import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.service.QueryService;
 import com.ceyentra.sm.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -37,6 +40,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final QueryRepo queryRepo;
     private final QueryService queryService;
     private final TableReservationDetailRepo tableReservationDetailRepo;
+    private final EmailService emailService;
 
 
     @Override
@@ -413,6 +417,15 @@ public class ReservationServiceImpl implements ReservationService {
                     mealOrderEntity.get().setOperationalStatus(reqDTO.getMStatus());
                     mealOrderEntity.get().setUpdatedDate(new Date());
                     mealOrderRepo.save(mealOrderEntity.get());
+
+                    try {
+                        emailService.sendUserMealOrderOperationalStatusChangeEmail(UserDTO.builder()
+                                .email(mealOrderEntity.get().getUserEntity().getEmail())
+                                .build(), mealOrderEntity.get(), reqDTO.getMStatus());
+                    } catch (MessagingException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
                     break;
 
                 case TABLE:
@@ -426,6 +439,15 @@ public class ReservationServiceImpl implements ReservationService {
                     tableReservation.get().setUpdatedDate(new Date());
                     tableReservation.get().setApprovedNote(reqDTO.getNote());
                     tableReservationRepo.save(tableReservation.get());
+
+                    try {
+                        emailService.sendUserTableReservationOperationalStatusChangeEmail(UserDTO.builder()
+                                .email(tableReservation.get().getCustomer().getEmail())
+                                .build(), tableReservation.get(), reqDTO.getTStatus());
+                    } catch (MessagingException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
                     break;
             }
         } catch (Exception e) {

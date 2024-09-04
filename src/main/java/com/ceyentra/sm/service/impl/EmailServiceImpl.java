@@ -5,9 +5,11 @@
 package com.ceyentra.sm.service.impl;
 
 import com.ceyentra.sm.constant.EmailTemplateConstant;
-import com.ceyentra.sm.dto.SampleRequestDTO;
 import com.ceyentra.sm.dto.UserDTO;
-import com.ceyentra.sm.enums.UserRole;
+import com.ceyentra.sm.entity.MealOrderEntity;
+import com.ceyentra.sm.entity.TableReservationEntity;
+import com.ceyentra.sm.enums.MealOperationalStatus;
+import com.ceyentra.sm.enums.TableReservationOperationalStatus;
 import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.util.EmailSender;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
-import java.util.List;
 
 @Service
 @Transactional
@@ -30,23 +31,6 @@ public class EmailServiceImpl implements EmailService {
     public EmailServiceImpl(EmailSender emailSender, EmailTemplateConstant emailTemplateConstant) {
         this.emailSender = emailSender;
         this.emailTemplateConstant = emailTemplateConstant;
-    }
-
-    //done
-    @Override
-    public void sendUserAccountCredentialsEmail(UserDTO userDTO) throws MessagingException {
-        log.info("start function sendUserAccountDetailsEmail @Param userDTO : {}", userDTO);
-        try {
-
-            //send user new account credentials
-            emailSender.sendSimpleEmail(userDTO.getEmail(),
-                    EmailTemplateConstant.NEW_USER_ACCOUNT_CREDENTIAL_EMAIL_SUBJECT,
-                    emailTemplateConstant.sendUserAccountDetailsTemplate(userDTO));
-
-        } catch (Exception e) {
-            log.error("function sendUserAccountDetailsEmail {}", e.getMessage(), e);
-            throw e;
-        }
     }
 
     //done
@@ -83,75 +67,41 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendBuyerSampleRequestAcceptedEmail(UserDTO userDTO, SampleRequestDTO sampleRequestDTO) throws MessagingException {
-        log.info("start sendBuyerSampleRequestAcceptedEmail @Param userDTO : {}", userDTO);
+    public void sendUserMealOrderOperationalStatusChangeEmail(UserDTO userDTO, MealOrderEntity mealOrderEntity, MealOperationalStatus mealOperationalStatus) throws MessagingException {
+        log.info("start sendUserMealOrderOperationalStatusChangeEmail @Param userDTO : {}", userDTO);
         try {
-
-            //sending buyer
-            emailSender.sendSimpleEmail(userDTO.getEmail(),
-                    EmailTemplateConstant.SEND_BUYER_SAMPLE_REQUEST_ACCEPTED_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-                    emailTemplateConstant.sendBuyerSampleRequestAcceptedTemplate(userDTO, sampleRequestDTO));
-
+            if (mealOperationalStatus.equals(MealOperationalStatus.ACCEPTED)) {
+                emailSender.sendSimpleEmail(userDTO.getEmail(),
+                        EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
+                        "<html><body><p></</body></html>");
+            } else {
+                emailSender.sendSimpleEmail(userDTO.getEmail(),
+                        EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
+                        "");
+            }
         } catch (Exception e) {
-            log.error("function sendBuyerSampleRequestAcceptedEmail {}", e.getMessage(), e);
+            log.error("function sendUserMealOrderOperationalStatusChangeEmail {}", e.getMessage(), e);
             throw e;
         }
     }
 
     @Override
-    public void sendBuyerSampleRequestDeclinedEmail(UserDTO userDTO, SampleRequestDTO sampleRequestDTO) throws MessagingException {
-        log.info("start sendBuyerSampleRequestDeclinedEmail @Param userDTO : {}", userDTO);
+    public void sendUserTableReservationOperationalStatusChangeEmail(UserDTO userDTO, TableReservationEntity entity, TableReservationOperationalStatus status) throws MessagingException {
+        log.info("start sendUserTableReservationOperationalStatusChangeEmail @Param userDTO : {}", userDTO);
         try {
-
-            //sending buyer
-            emailSender.sendSimpleEmail(userDTO.getEmail(),
-                    EmailTemplateConstant.SEND_BUYER_SAMPLE_REQUEST__DECLINED_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-                    emailTemplateConstant.sendBuyerSampleRequestDeclinedTemplate(userDTO, sampleRequestDTO));
-
+            if (status.equals(TableReservationOperationalStatus.APPROVED)) {
+                emailSender.sendSimpleEmail(userDTO.getEmail(),
+                        EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
+                        "<html><body></</body></html>");
+            } else {
+                emailSender.sendSimpleEmail(userDTO.getEmail(),
+                        EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
+                        "");
+            }
         } catch (Exception e) {
-            log.error("function sendBuyerSampleRequestDeclinedEmail {}", e.getMessage(), e);
+            log.error("function sendUserTableReservationOperationalStatusChangeEmail {}", e.getMessage(), e);
             throw e;
         }
     }
 
-    @Override
-    public void sendSampleRequestToManagersOrSREmployees(List<String> emails, SampleRequestDTO sampleRequestDTO, UserRole userRole) throws MessagingException {
-        try {
-//            switch (userRole) {
-//                case MANAGER:
-//                    for (String email : emails) {
-//                        emailSender.sendSimpleEmail(email,
-//                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-//                                emailTemplateConstant.sendSampleRequestToManagerTemplate(sampleRequestDTO));
-//                    }
-//                    break;
-//
-//                case SAMPLE_ROOM_EMPLOYEE:
-//                    for (String email : emails) {
-//                        emailSender.sendSimpleEmail(email,
-//                                EmailTemplateConstant.SEND_NEW_SAMPLE_REQUEST_EMAIL_SUBJECT + sampleRequestDTO.getId(),
-//                                emailTemplateConstant.sendSampleRequestToSREmployeeTemplate(sampleRequestDTO));
-//                    }
-//                    break;
-//            }
-        } catch (Exception e) {
-            log.info("function sendSampleRequestToManagersAndSREEmployees {}", e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @Override
-    public void sendSampleEmail() throws MessagingException {
-        log.info("start function sendSampleEmail");
-        try {
-
-            //sending email for new account credentials
-//            emailSender.sendSimpleEmail("dinuthdheeraka345@gmail.com", "",
-//                    emailTemplateConstant.sendBuyerSampleRequestAcceptedTemplate());
-
-        } catch (Exception e) {
-            log.error("function sendSampleEmail {}", e.getMessage(), e);
-            throw e;
-        }
-    }
 }

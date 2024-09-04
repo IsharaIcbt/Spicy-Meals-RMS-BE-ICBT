@@ -1,11 +1,30 @@
-#ABC Restaurant
+# 🍽️ ABC Restaurant
 
-ABC Restaurant is one of the most popular restaurant brands that has its outlets in different cities of Sri Lanka. The restaurant is famous for its wide range of meals and high quality of services provided to the customers. In order to sustain its competitiveness and respond to the increasing demands of the customers who are increasingly becoming technology-savvy, the management has planned to diversify its operations by developing a web application. With this online system, customers will be able to book tables, order foods, ask for services, and make payments all from the comfort of their homes. 
+**ABC Restaurant** is one of the most popular restaurant brands in Sri Lanka, renowned for its wide range of meals and exceptional customer service. To meet the growing demand from tech-savvy customers, the management has decided to diversify its operations by developing a comprehensive web application. This online platform will allow customers to book tables, order food, request services, and make payments—all from the comfort of their homes.
 
- ##Objectives 
- The main objectives of the project are as follows:The main objectives of the project are as follows: 
-•	To Develop an Online Reservation System: Allow the customers to book tables, view the menus, and order the meals online. 
-•	To Enhance Customer Interaction: Introduce a query management system that enables the customers to send messages to the restaurant staff concerning reservation and services. 
-•	To Streamline Payment Processes: Ensure that payment methods for bookings and orders are secure payment gateways. 
-•	To Provide Administrative Tools: Provide the restaurant’s management and employees with the means to monitor and control the restaurant’s operations and activities such as reservation viewing and management, order processing, customer inquiries, and business reports generation. 
-•	To Create a User-Friendly Interface: It is also important to make the system as user friendly as possible, for all types of technological users.
+## 🎯 Objectives
+
+The main objectives of the project are:
+
+- **Develop an Online Reservation System**: Enable customers to book tables, view menus, and order meals online.
+- **Enhance Customer Interaction**: Introduce a query management system for customers to communicate with restaurant staff regarding reservations and services.
+- **Streamline Payment Processes**: Implement secure payment gateways for bookings and orders.
+- **Provide Administrative Tools**: Equip restaurant management and staff with tools to monitor and control operations such as reservation management, order processing, customer inquiries, and business report generation.
+- **Create a User-Friendly Interface**: Design the system to be accessible and easy to use for all types of users.
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [ ] Java
+- [ ] Spring Boot
+- [ ] Hibernate
+- [ ] Meven
+- [ ] Spring Security 
+- [ ] MySQL
+      
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ABC-Restaurant.git

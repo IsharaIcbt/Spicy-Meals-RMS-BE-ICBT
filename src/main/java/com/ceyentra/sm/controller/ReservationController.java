@@ -33,12 +33,6 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final QueryService queryService;
 
-    @PostConstruct
-    public void init() {
-        // Set your secret API key
-        Stripe.apiKey = "sk_test_51PtXuxL18030aj4hVq7Y6fEarn0xyqtwWouHUge2IJZE0yN7IsBAYqPxxKguejK4P1VApkirGOw0uyZpJOTtkm1m00UxmzCXF5";
-    }
-
     @PostMapping("/table")
     public ResponseEntity<Object> saveTableReservation(@RequestBody TableReservationReqDTO reqDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(reservationService.saveTableReservation(reqDTO));
@@ -46,10 +40,9 @@ public class ReservationController {
 
     @PostMapping("/meal")
     public ResponseEntity<Object> saveMealOrder(@RequestBody MealOrderReqDTO reqDTO) {
-        reservationService.saveMealOrder(reqDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.builder()
                 .success(true)
-                .message("Saved meal order")
+                .data(reservationService.saveMealOrder(reqDTO))
                 .build());
     }
 

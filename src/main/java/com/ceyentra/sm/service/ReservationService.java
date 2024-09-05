@@ -26,4 +26,6 @@ public interface ReservationService {
     void updateReservationOperationalStatus(Long id, ReservationApproveReqDTO reqDTO);
 
     String generatePaymentSessionLinkMealOrder(List<MealOrderDetail> mealOrderDetails) throws StripeException;
+
+    void settleOrderPayment(QueryType type, Long orderId);
 }

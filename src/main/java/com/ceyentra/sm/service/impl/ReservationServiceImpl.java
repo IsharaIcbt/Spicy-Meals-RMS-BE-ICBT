@@ -46,6 +46,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final QueryService queryService;
     private final TableReservationDetailRepo tableReservationDetailRepo;
     private final EmailService emailService;
+    private final PaymentRepo paymentRepo;
 
     @PostConstruct
     public void init() {
@@ -130,6 +131,8 @@ public class ReservationServiceImpl implements ReservationService {
 
             MealOrderEntity savedMealOrder = mealOrderRepo.save(mealOrder);
 
+            AtomicReference<Float> total = new AtomicReference<>((float) 0);
+
             // create meal order detail
             if (mealOrderDTO.getItems() != null && !mealOrderDTO.getItems().isEmpty()) {
 
@@ -141,10 +144,14 @@ public class ReservationServiceImpl implements ReservationService {
                         throw new ApplicationServiceException(200, false, "Meal not found!");
                     }
 
+                    float price = meal.get().getDiscount() == null ? meal.get().getPrice() : meal.get().getPrice() - meal.get().getDiscount();
+
+                    total.updateAndGet(v -> v + price);
+
                     return MealOrderDetail.builder()
                             .meal(meal.get())
                             .qty(item.getQty())
-                            .price(meal.get().getDiscount() == null ? meal.get().getPrice() : meal.get().getPrice() - meal.get().getDiscount())
+                            .price(price)
                             .discount(meal.get().getDiscount())
                             .mealOrder(savedMealOrder)
                             .build();
@@ -153,6 +160,16 @@ public class ReservationServiceImpl implements ReservationService {
                 // save order details and generate payment session link
                 try {
                     mealOrderDetailRepo.saveAll(orderDetails);
+
+                    paymentRepo.save(Payment.builder()
+                            .queryType(QueryType.MEAL)
+                            .mealOrder(savedMealOrder)
+                            .price(total.get())
+                            .createdDate(new Date())
+                            .updatedDate(new Date())
+                            .paymentStatus(PaymentStatus.PENDING)
+                            .build());
+
                     return OrderPaymentSessionResDTO.builder()
                             .orderId(savedMealOrder.getId())
                             .sessionLink(generatePaymentSessionLinkMealOrder(orderDetails))
@@ -501,6 +518,31 @@ public class ReservationServiceImpl implements ReservationService {
                 .build();
 
         return Session.create(createParams).getUrl();
+    }
+
+    @Override
+    public void settleOrderPayment(QueryType type, Long orderId) {
+
+        if (type == QueryType.MEAL) {
+            Optional<MealOrderEntity> mealOrderEntity = mealOrderRepo.findById(orderId);
+
+            if (!mealOrderEntity.isPresent()) {
+                throw new ApplicationServiceException(400, false, "Meal order does not exist");
+            }
+
+            mealOrderEntity.get().getPayment().setPaymentStatus(PaymentStatus.PAID);
+            mealOrderRepo.save(mealOrderEntity.get());
+
+        }else{
+            Optional<TableReservationEntity> tableReservation = tableReservationRepo.findById(orderId);
+
+            if (!tableReservation.isPresent()) {
+                throw new ApplicationServiceException(400, false, "Meal order does not exist");
+            }
+
+            tableReservation.get().getPayment().setPaymentStatus(PaymentStatus.PAID);
+            tableReservationRepo.save(tableReservation.get());
+        }
     }
 
 }

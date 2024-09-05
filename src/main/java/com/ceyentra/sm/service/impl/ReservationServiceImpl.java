@@ -12,6 +12,10 @@ import com.ceyentra.sm.repository.*;
 import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.service.QueryService;
 import com.ceyentra.sm.service.ReservationService;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -19,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +47,10 @@ public class ReservationServiceImpl implements ReservationService {
     private final TableReservationDetailRepo tableReservationDetailRepo;
     private final EmailService emailService;
 
+    @PostConstruct
+    public void init() {
+        Stripe.apiKey = "sk_test_51PtXuxL18030aj4hVq7Y6fEarn0xyqtwWouHUge2IJZE0yN7IsBAYqPxxKguejK4P1VApkirGOw0uyZpJOTtkm1m00UxmzCXF5";
+    }
 
     @Override
     public TableReservationResDTO saveTableReservation(TableReservationReqDTO reqDTO) {
@@ -86,7 +95,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void saveMealOrder(MealOrderReqDTO mealOrderDTO) {
+    public OrderPaymentSessionResDTO saveMealOrder(MealOrderReqDTO mealOrderDTO) {
         try {
             log.info("start function save meal order @Params mealOrderDTO: {}", mealOrderDTO);
 
@@ -141,7 +150,16 @@ public class ReservationServiceImpl implements ReservationService {
                             .build();
                 }).collect(Collectors.toList());
 
-                mealOrderDetailRepo.saveAll(orderDetails);
+                // save order details and generate payment session link
+                try {
+                    mealOrderDetailRepo.saveAll(orderDetails);
+                    return OrderPaymentSessionResDTO.builder()
+                            .orderId(savedMealOrder.getId())
+                            .sessionLink(generatePaymentSessionLinkMealOrder(orderDetails))
+                            .build();
+                } catch (Exception e) {
+                    throw new ApplicationServiceException(200, false, "Error while saving order details!");
+                }
 
             } else {
                 throw new ApplicationServiceException(200, false, "No items found!");
@@ -454,6 +472,35 @@ public class ReservationServiceImpl implements ReservationService {
             log.error(e);
             throw e;
         }
+    }
+
+    @Override
+    public String generatePaymentSessionLinkMealOrder(List<MealOrderDetail> mealOrderDetails) throws StripeException {
+
+        String DOMAIN = "http://localhost:3000";
+
+        List<SessionCreateParams.LineItem> lineItems = mealOrderDetails.stream().map(mealOrderDetail -> SessionCreateParams.LineItem.builder()
+                .setQuantity(mealOrderDetail.getQty().longValue())
+                .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                        .setCurrency("LKR")
+                        .setUnitAmount(mealOrderDetail.getPrice().longValue())
+                        .setProductData(
+                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                        .setName(mealOrderDetail.getMeal().getName())
+                                        .addImage(mealOrderDetail.getMeal().getImage())
+                                        .setDescription(mealOrderDetail.getMeal().getDescription())
+                                        .build())
+                        .build())
+                .build()).collect(Collectors.toList());
+
+        SessionCreateParams createParams = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl(DOMAIN + "/success.html")
+                .setCancelUrl(DOMAIN + "/canceled.html")
+                .addAllLineItem(lineItems)
+                .build();
+
+        return Session.create(createParams).getUrl();
     }
 
 }

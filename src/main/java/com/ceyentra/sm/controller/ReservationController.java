@@ -9,7 +9,6 @@ import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
 import com.ceyentra.sm.enums.QueryType;
 import com.ceyentra.sm.service.QueryService;
 import com.ceyentra.sm.service.ReservationService;
-import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -19,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.PostConstruct;
 
 
 @RestController
@@ -101,6 +98,15 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
                 .success(true)
                 .message("Updated order status successfully.")
+                .build());
+    }
+
+    @PostMapping("/payment/order/session/{type}/{orderId}")
+    public Object savePaymentRecord(@PathVariable QueryType type, @PathVariable Long orderId) {
+        reservationService.settleOrderPayment(type, orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseDTO.builder()
+                .success(true)
+                .message("Updated order payment status successfully.")
                 .build());
     }
 

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import java.text.SimpleDateFormat;
 
 @Service
 @Transactional
@@ -77,7 +78,7 @@ public class EmailServiceImpl implements EmailService {
             } else {
                 emailSender.sendSimpleEmail(userDTO.getEmail(),
                         EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
-                        "");
+                        emailTemplateConstant.mealReservationRejectedTemplate(mealOrderEntity));
             }
         } catch (Exception e) {
             log.error("function sendUserMealOrderOperationalStatusChangeEmail {}", e.getMessage(), e);
@@ -92,11 +93,11 @@ public class EmailServiceImpl implements EmailService {
             if (status.equals(TableReservationOperationalStatus.APPROVED)) {
                 emailSender.sendSimpleEmail(userDTO.getEmail(),
                         EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
-                        "<html><body></</body></html>");
+                        emailTemplateConstant.tableReservationApprovedTemplate(entity));
             } else {
                 emailSender.sendSimpleEmail(userDTO.getEmail(),
                         EmailTemplateConstant.SEND_MEAL_ORDER_STATUS_SUBJECT,
-                        "");
+                        emailTemplateConstant.tableReservationDeclinedTemplate(entity));
             }
         } catch (Exception e) {
             log.error("function sendUserTableReservationOperationalStatusChangeEmail {}", e.getMessage(), e);

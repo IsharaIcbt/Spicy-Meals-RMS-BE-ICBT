@@ -72,4 +72,6 @@ public class MealOrderEntity {
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     Date updatedDate;
 
+    @OneToOne(mappedBy = "mealOrder")
+    Payment payment;
 }

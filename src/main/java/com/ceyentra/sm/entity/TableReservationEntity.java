@@ -73,6 +73,9 @@ public class TableReservationEntity {
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     Date updatedDate;
 
+    @OneToOne(mappedBy = "tableReservation")
+    Payment payment;
+
     @Override
     public String toString() {
         return "TableReservationEntity{" +

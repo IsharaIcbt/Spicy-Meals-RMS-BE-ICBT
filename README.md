@@ -27,4 +27,4 @@ The main objectives of the project are:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ABC-Restaurant.git
+   git clone https://github.com/IsharaIcbt/Spicy-Meals-RMS-BE-ICBT.git

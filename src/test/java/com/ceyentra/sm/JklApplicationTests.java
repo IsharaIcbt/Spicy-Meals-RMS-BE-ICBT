@@ -270,6 +270,7 @@ class JklApplicationTests {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/reservation/meal")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic VVNFUjo=")
                         .content(jsonPayload))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));

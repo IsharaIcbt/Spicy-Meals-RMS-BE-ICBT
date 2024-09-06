@@ -146,7 +146,7 @@ public class ReservationServiceImpl implements ReservationService {
 
                     float price = meal.get().getDiscount() == null ? meal.get().getPrice() : meal.get().getPrice() - meal.get().getDiscount();
 
-                    total.updateAndGet(v -> v + price);
+                    total.updateAndGet(v -> v + price * item.getQty());
 
                     return MealOrderDetail.builder()
                             .meal(meal.get())
@@ -175,7 +175,8 @@ public class ReservationServiceImpl implements ReservationService {
                             .sessionLink(generatePaymentSessionLinkMealOrder(orderDetails))
                             .build();
                 } catch (Exception e) {
-                    throw new ApplicationServiceException(200, false, "Error while saving order details!");
+                    log.error(e);
+                    throw new ApplicationServiceException(200, false, e.getMessage());
                 }
 
             } else {
@@ -533,7 +534,7 @@ public class ReservationServiceImpl implements ReservationService {
             mealOrderEntity.get().getPayment().setPaymentStatus(PaymentStatus.PAID);
             mealOrderRepo.save(mealOrderEntity.get());
 
-        }else{
+        } else {
             Optional<TableReservationEntity> tableReservation = tableReservationRepo.findById(orderId);
 
             if (!tableReservation.isPresent()) {

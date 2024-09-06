@@ -51,7 +51,8 @@ class JklApplicationTests {
                         .param("phoneNumber", "0701234567")
                         .param("homeAddress", "ruwanwella")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"message\":\"User successfully registered.\",\"success\":true}"));
     }
 
     @Test

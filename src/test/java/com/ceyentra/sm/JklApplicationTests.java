@@ -1,6 +1,10 @@
 package com.ceyentra.sm;
 
+import com.ceyentra.sm.dto.web.request.MealOrderAddress;
+import com.ceyentra.sm.dto.web.request.MealOrderItemReq;
+import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
 import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
+import com.ceyentra.sm.enums.MealOrderType;
 import com.ceyentra.sm.enums.TableReservationType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -13,6 +17,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -231,4 +237,41 @@ class JklApplicationTests {
                 .andExpect(content().json("{\"success\":true,\"message\":\"Table reservation saved successfully.\"}"));
     }
 
+
+    @Test
+    void testSaveMealOrder() throws Exception {
+
+        MealOrderItemReq item1 = MealOrderItemReq.builder()
+                .id(1L)
+                .qty(2.0F)
+                .build();
+
+        MealOrderItemReq item2 = MealOrderItemReq.builder()
+                .id(2L)
+                .qty(1.5F)
+                .build();
+
+        MealOrderAddress address = MealOrderAddress.builder()
+                .address("")
+                .fullName("")
+                .mobileNumber("")
+                .restaurantId(1L)
+                .build();
+
+        MealOrderReqDTO reqDTO = MealOrderReqDTO.builder()
+                .restaurantId(1L)
+                .isDiffAddress(true)
+                .orderType(MealOrderType.ONLINE)
+                .items(new ArrayList<>(Arrays.asList(item1, item2)))
+                .address(address)
+                .build();
+
+        String jsonPayload = objectMapper.writeValueAsString(reqDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/v1/reservation/meal")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
 }

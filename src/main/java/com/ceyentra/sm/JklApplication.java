@@ -14,13 +14,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling
 public class JklApplication extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(JklApplication.class);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(JklApplication.class);
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(JklApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(JklApplication.class, args);
+    }
 }

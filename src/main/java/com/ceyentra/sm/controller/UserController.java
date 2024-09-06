@@ -1,14 +1,10 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/5/2023 12:33 PM
- */
 package com.ceyentra.sm.controller;
 
 import com.ceyentra.sm.config.throttling_config.Throttling;
-import com.ceyentra.sm.dto.UserDTO;
 import com.ceyentra.sm.dto.common.CommonResponseDTO;
 import com.ceyentra.sm.dto.common.ResponseDTO;
 import com.ceyentra.sm.dto.web.request.UserPasswordResetRequestDTO;
+import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
 import com.ceyentra.sm.dto.web.request.ValidateUserOTPRequestDTO;
 import com.ceyentra.sm.dto.web.response.UserResponseDTO;
 import com.ceyentra.sm.enums.UserStatus;
@@ -44,8 +40,7 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<CommonResponseDTO> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<CommonResponseDTO> registerUser(@ModelAttribute UserSaveReqDTO userDTO) {
         userService.saveUser(userDTO);
         return new ResponseEntity<>(
                 CommonResponseDTO.builder()
@@ -67,7 +62,7 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 20)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    /* @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")*/
     public ResponseEntity<ResponseDTO<Object>> getAllUsers(
             @RequestParam(value = "key", required = false) String key,
             @RequestParam(value = "value", required = false) String value) {
@@ -79,7 +74,7 @@ public class UserController {
                 data = USER_DTO_USER_RESPONSE_DTO_FUNCTION.apply(userService.findUserByEmail(value));
             }
 
-        //if no filter found..return all users
+        //if no filter found.return all users
         return new ResponseEntity<>(
                 new ResponseDTO<>(
                         true, data == null ? USER_DTO_LIST_USER_RESPONSE_DTO_LIST_FUNCTION
@@ -215,12 +210,12 @@ public class UserController {
      */
     @Throttling(timeFrameInSeconds = 60, calls = 10)
     @PostMapping(value = "otp/validate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CommonResponseDTO> validateUserOTP(@RequestBody ValidateUserOTPRequestDTO requestDTO) {
+    public ResponseEntity<Object> validateUserOTP(@RequestBody ValidateUserOTPRequestDTO requestDTO) {
         userOTPService.validateUserOTP(requestDTO.getEmail(), requestDTO.getOtp());
         return new ResponseEntity<>(
-                CommonResponseDTO.builder()
+                ResponseDTO.builder()
                         .success(true)
-                        .message("Your OTP has been successfully verified.")
+                        .data(requestDTO)
                         .build()
                 , HttpStatus.OK);
     }

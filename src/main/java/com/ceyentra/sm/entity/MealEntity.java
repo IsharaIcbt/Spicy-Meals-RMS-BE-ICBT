@@ -1,6 +1,7 @@
 package com.ceyentra.sm.entity;
 
 import com.ceyentra.sm.enums.CommonStatus;
+import com.ceyentra.sm.enums.MainMealTypes;
 import com.ceyentra.sm.enums.MealCategory;
 import com.ceyentra.sm.enums.MealTypes;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,7 +28,7 @@ public class MealEntity {
 
     String name;
 
-    String imgURL;
+    String image;
 
     @Column(length = 1000)
     String description;
@@ -36,13 +37,15 @@ public class MealEntity {
 
     Float discount;
 
+    Long rating;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "sub_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'DRINK'")
+    @Column(name = "sub_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'EXTRA'")
     MealTypes subCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "main_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'LUNCH'")
-    MealTypes mainCategory;
+    MainMealTypes mainCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "meal_type", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'SRI_LANKAN'")

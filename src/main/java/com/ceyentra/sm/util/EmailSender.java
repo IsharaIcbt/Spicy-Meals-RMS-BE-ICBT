@@ -47,10 +47,7 @@ public class EmailSender {
             MimeMessage message = javaMailSender.createMimeMessage();
 
             message.setFrom(mailFrom);
-
-            log.info("recipient : " + recipient);
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
-
             message.setSubject(subject);
 
             // This mail has 2 part, the BODY and the embedded image
@@ -59,19 +56,14 @@ public class EmailSender {
             // first part (the html)
             BodyPart messageBodyPart = new MimeBodyPart();
             messageBodyPart.setContent(content, "text/html; charset=utf-8");
-
-            // add it
             multipart.addBodyPart(messageBodyPart);
-
-            // put everything together
             message.setContent(multipart);
-
             sendEmail(message);
 
             log.info("Email successfully dispatched.");
 
         } catch (MessagingException e) {
-            log.error("Function : sendSimpleEmail " + e.getMessage(), e);
+            log.error("Function sendSimpleEmail  : {}", e.getMessage(), e);
             throw e;
         }
     }

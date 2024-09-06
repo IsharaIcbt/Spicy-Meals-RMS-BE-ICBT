@@ -5,6 +5,7 @@
 package com.ceyentra.sm.dto.web.response;
 
 import com.ceyentra.sm.enums.UserRole;
+import com.ceyentra.sm.enums.UserStatus;
 import lombok.*;
 
 import java.util.Date;
@@ -16,10 +17,15 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDTO {
-
     private Long id;
+    private String img;
     private String name;
     private String email;
-    private Date createdDate;
+    private String password;
+    private String nic;
+    private String phoneNumber;
+    private String homeAddress;
     private UserRole userRole;
+    private Date createdDate;
+    private UserStatus userStatus;
 }

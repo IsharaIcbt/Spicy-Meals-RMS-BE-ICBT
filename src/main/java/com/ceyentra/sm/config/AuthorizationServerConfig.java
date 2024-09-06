@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/4/2023 11:57 AM
- */
 package com.ceyentra.sm.config;
 
 import com.ceyentra.sm.exception.CustomOauthException;
@@ -60,12 +56,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
                 .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
                 .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
+                .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS)
+                .and()
+
+                .withClient(STAFF_CLIENT_ID)
+                .secret(encoder.encode(CLIENT_SECRET))
+                .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
+                .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
+                .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS)
                 .refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-
         TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
         enhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
         endpoints.tokenStore(tokenStore())
@@ -80,6 +83,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CustomOauthException((exception.getMessage()) != null ?
                                 exception.getMessage() : "Sorry, something went wrong."));
                 });
+
+//        endpoints.tokenStore(tokenStore())
+//                .authenticationManager(authenticationManager)
+//                .accessTokenConverter(accessTokenConverter())
+//                .pathMapping("/oauth/token", "/v1/oauth/token")
+//                .exceptionTranslator(exception -> {
+//                    if (exception instanceof InvalidGrantException)
+//                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CustomOauthException("Invalid credentials."));
+//                    else
+//                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CustomOauthException((exception.getMessage()) != null ?
+//                                exception.getMessage() : "Sorry, something went wrong."));
+//                });
     }
 
     @Bean
@@ -98,5 +113,4 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public TokenEnhancer tokenEnhancer() {
         return customTokenEnhancer;
     }
-
 }

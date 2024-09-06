@@ -37,6 +37,9 @@ public class StaffEntity {
     @Column(name = "password", nullable = false)
     String password;
 
+    @Column(name = "temp_password", nullable = false)
+    String tempPassword;
+
     @Column(name = "nic")
     String nic;
 

@@ -24,7 +24,7 @@ public class MealOrderDetail {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "meal_order_id")
-    MealOrder mealOrder;
+    MealOrderEntity mealOrder;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "meal_id")
@@ -33,6 +33,8 @@ public class MealOrderDetail {
     Float price;
 
     Float discount;
+
+    Float qty;
 
     @Column(name = "created_date")
     @CreationTimestamp

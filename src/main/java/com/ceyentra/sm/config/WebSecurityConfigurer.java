@@ -1,7 +1,3 @@
-/**
- * @author :  Dinuth Dheeraka
- * Created : 8/4/2023 10:55 AM
- */
 package com.ceyentra.sm.config;
 
 import org.springframework.beans.factory.annotation.Autowired;

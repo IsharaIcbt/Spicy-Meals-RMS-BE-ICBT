@@ -4,19 +4,30 @@
  */
 package com.ceyentra.sm.service.impl;
 
+import com.ceyentra.sm.constant.ApplicationConstant;
 import com.ceyentra.sm.dto.UserDTO;
-import com.ceyentra.sm.dto.UserOTPDTO;
+import com.ceyentra.sm.dto.web.request.UserSaveReqDTO;
+import com.ceyentra.sm.entity.AdminEntity;
+import com.ceyentra.sm.entity.EmailPasswordResetOTPEntity;
+import com.ceyentra.sm.entity.StaffEntity;
 import com.ceyentra.sm.entity.UserEntity;
+import com.ceyentra.sm.enums.CommonStatus;
+import com.ceyentra.sm.enums.UserRole;
 import com.ceyentra.sm.enums.UserStatus;
 import com.ceyentra.sm.exception.ApplicationServiceException;
 import com.ceyentra.sm.exception.UserException;
-import com.ceyentra.sm.repository.UserRepository;
+import com.ceyentra.sm.exception.UserOTPException;
+import com.ceyentra.sm.repository.AdminRepo;
+import com.ceyentra.sm.repository.EmailPasswordResetOTPRepo;
+import com.ceyentra.sm.repository.StaffRepo;
+import com.ceyentra.sm.repository.UserRepo;
 import com.ceyentra.sm.service.EmailService;
 import com.ceyentra.sm.service.UserOTPService;
 import com.ceyentra.sm.service.UserService;
 import com.ceyentra.sm.util.EmailValidator;
 import com.ceyentra.sm.util.OTPGenerator;
 import com.ceyentra.sm.util.PasswordGenerator;
+import com.ceyentra.sm.util.S3BucketUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -24,6 +35,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,55 +48,57 @@ import static com.ceyentra.sm.constant.ApplicationConstant.*;
 @Log4j2
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
     private final UserOTPService userOTPService;
     private final ModelMapper modelMapper;
     private final EmailValidator emailValidator;
     private final PasswordGenerator passwordGenerator;
     private final OTPGenerator OTPGenerator;
     private final EmailService emailService;
+    private final AdminRepo adminRepo;
+    private final StaffRepo staffRepo;
+    private final UserRepo userRepo;
+    private final S3BucketUtil s3BucketUtil;
+    private final EmailPasswordResetOTPRepo emailPasswordResetOTPRepo;
 
     @Override
-    public void saveUser(UserDTO userDTO) {
+    public void saveUser(UserSaveReqDTO userDTO) {
         log.info("Start function saveUser @Param userDTO : {}", userDTO);
         try {
-
-            //check given email is already taken
-            Optional<UserEntity> userEntityByEmail = userRepository.findUserEntityByEmail(userDTO.getEmail());
-            if (userDTO.getEmail() != null && (userEntityByEmail.isPresent() && (userEntityByEmail.get().getStatus() != UserStatus.DELETED)))
-                throw new UserException(EMAILS_ARE_SAME, false, "The email you provided already exists. Please choose a different email.");
-
             //validate email
-            if (!(userDTO.getEmail() != null && emailValidator.isValidEmail(userDTO.getEmail())))
+            if (userDTO.getEmail() == null || userDTO.getEmail().isEmpty() || !emailValidator.isValidEmail(userDTO.getEmail()))
                 throw new UserException(INVALID_EMAIL, false, "Please enter a valid email address.");
 
-            //generating a new password
-            String password = passwordGenerator.generatePassword(8);
+            validateUniqueEmail(userDTO.getEmail());
 
-            //encode the password and set back to UserDTO
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            userDTO.setPassword(bCryptPasswordEncoder.encode(password));
+            userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
 
-            //save user
-            userDTO.setId(0L);
-            userDTO.setUserStatus(UserStatus.ACTIVE);
-            userRepository.save(modelMapper.map(userDTO, UserEntity.class));
+            // Initialize fileURL variable
+            String fileURL = null;
+            MultipartFile file = userDTO.getImgFile();
 
-            //begin email sending..
-
-            //set back plain text password to userDTO
-            userDTO.setPassword(password);
-
-            //send email that contains new account credentials
-            try {
-                emailService.sendUserAccountCredentialsEmail(userDTO);
-            } catch (Exception e) {
-                throw new ApplicationServiceException(COMMON_ERROR_CODE, false, "Unable to send user credentials email.");
+            // Only attempt to upload the file if it is not null
+            if (file != null && !file.isEmpty()) {
+                fileURL = s3BucketUtil.uploadMultipartToS3bucket(USERS_S3_BUCKET_FOLDER + s3BucketUtil.generateFileName(file), file);
             }
+
+            UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);
+            userEntity.setId(0L);
+            userEntity.setImg(fileURL);
+            userEntity.setUserRole(UserRole.CUSTOMER);
+            userEntity.setStatus(UserStatus.ACTIVE);
+            userRepository.save(userEntity);
 
         } catch (Exception e) {
             log.error("function saveUser : {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    private void validateUniqueEmail(String email) {
+        if (adminRepo.findByEmail(email).isPresent() || staffRepo.findByEmail(email).isPresent() || userRepo.findByEmail(email).isPresent()) {
+            throw new ApplicationServiceException(200, false, "Email is already in use");
         }
     }
 
@@ -205,14 +219,36 @@ public class UserServiceImpl implements UserService {
     public void resetUserPassword(String email, int OTP, String password) {
         log.info("starting resetUserPassword @Param email : {} OTP : {} password : {}", email, OTP, password);
         try {
+            Optional<EmailPasswordResetOTPEntity> byEmailAndOtp = emailPasswordResetOTPRepo.findEmailPasswordResetOTPEntitiesByEmailAndOtp(email, String.valueOf(OTP));
 
-            //validate email and OTP
-            userOTPService.validateUserOTP(email, OTP);
+            if (!byEmailAndOtp.isPresent())
+                throw new UserOTPException(ApplicationConstant.INVALID_OTP, false, "OTP verification failed.");
 
-            //check user is exists with given email(directly call to the service method)
-            UserDTO userByEmail = findUserByEmail(email);
+            Optional<AdminEntity> admin = adminRepo.findByEmail(email);
 
-            resetUserPassword(userByEmail.getId(), password, false);
+            if (admin.isPresent() && admin.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                admin.get().setPassword(bCryptPasswordEncoder.encode(password));
+                adminRepo.save(admin.get());
+                return;
+            }
+
+            Optional<UserEntity> customer = userRepository.findByEmail(email);
+
+            if (customer.isPresent() && customer.get().getStatus().equals(UserStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                customer.get().setPassword(bCryptPasswordEncoder.encode(password));
+                userRepo.save(customer.get());
+                return;
+            }
+
+            Optional<StaffEntity> staff = staffRepo.findByEmail(email);
+
+            if (staff.isPresent() && staff.get().getStatus().equals(CommonStatus.ACTIVE)) {
+                BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+                staff.get().setPassword(bCryptPasswordEncoder.encode(password));
+                staffRepo.save(staff.get());
+            }
 
         } catch (Exception e) {
             log.error("function resetUserPassword(email,OTP,password) : {}", e.getMessage(), e);
@@ -240,23 +276,36 @@ public class UserServiceImpl implements UserService {
     public void sendUserOTP(String email) {
         log.info("class : {} function sendUserOTP @Param email :  {}", getClass().getName(), email);
         try {
-
-            //check user if exists with provided email(call to the service method)
-            UserDTO userByEmail = findUserByEmail(email);
+//            Optional<AdminEntity> admin = adminRepo.findByEmail(email);
+//
+//            Optional<UserEntity> customer = userRepository.findByEmail(email);
+//
+//            Optional<StaffEntity> staff = staffRepo.findByEmail(email);
+//
+//            if ((!admin.isPresent() || !admin.get().getStatus().equals(CommonStatus.ACTIVE)) &&
+//                    (!customer.isPresent() || !customer.get().getStatus().equals(UserStatus.ACTIVE)) &&
+//                    (!staff.isPresent() || !staff.get().getStatus().equals(CommonStatus.ACTIVE))) {
+//                throw new UserException(USER_NOT_FOUND, false,
+//                        "Sorry, user not found. Please check the email and try again.");
+//            }
 
             //generate OTP
             int OTP = OTPGenerator.generateOTP();
 
-            //save user with OTP
-            userOTPService.addUserOTP(UserOTPDTO.builder()
-                    .userDTO(userByEmail)
-                    .OTP(OTP)
-                    .build()
-            );
+            EmailPasswordResetOTPEntity otpEntity = EmailPasswordResetOTPEntity.builder()
+                    .otp(String.valueOf(OTP))
+                    .email(email)
+                    .build();
+
+            emailPasswordResetOTPRepo.deleteAll(emailPasswordResetOTPRepo.findEmailPasswordResetOTPEntitiesByEmail(email));
+
+            emailPasswordResetOTPRepo.save(otpEntity);
 
             //send email to the user that contains OTP
             try {
-                emailService.sendUserOTPEmail(userByEmail, OTP);
+                emailService.sendUserOTPEmail(UserDTO.builder()
+                        .email(email)
+                        .build(), OTP);
             } catch (Exception e) {
                 throw new ApplicationServiceException(COMMON_ERROR_CODE, false, "Unable to the send OTP");
             }

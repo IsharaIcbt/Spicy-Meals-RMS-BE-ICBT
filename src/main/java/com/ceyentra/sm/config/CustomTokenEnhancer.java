@@ -4,41 +4,38 @@
  */
 package com.ceyentra.sm.config;
 
-import com.ceyentra.sm.constant.OAuth2Constant;
-import com.ceyentra.sm.dto.web.response.UserResponseDTO;
-import com.ceyentra.sm.service.OAuth2UserService;
-import com.ceyentra.sm.service.UserService;
+import com.ceyentra.sm.dto.UserDTO;
+import com.ceyentra.sm.entity.AdminEntity;
+import com.ceyentra.sm.entity.StaffEntity;
+import com.ceyentra.sm.entity.UserEntity;
+import com.ceyentra.sm.repository.AdminRepo;
+import com.ceyentra.sm.repository.StaffRepo;
+import com.ceyentra.sm.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.ceyentra.sm.constant.FunctionalConstant.USER_DTO_USER_RESPONSE_DTO_FUNCTION;
+import java.util.Optional;
 
 @Component
 public class CustomTokenEnhancer extends JwtAccessTokenConverter {
 
-    private final OAuth2UserService oauth2UserService;
-    private final HttpServletRequest request;
-    private final BCryptPasswordEncoder encoder;
-    private final UserService userService;
+    private final AdminRepo adminRepo;
+    private final StaffRepo staffRepo;
+    private final UserRepo userRepo;
+
 
     @Autowired
-    public CustomTokenEnhancer(OAuth2UserService oauth2UserService, HttpServletRequest request, BCryptPasswordEncoder encoder, UserService userService) {
-        this.oauth2UserService = oauth2UserService;
-        this.request = request;
-        this.encoder = encoder;
-        this.userService = userService;
+    public CustomTokenEnhancer(AdminRepo adminRepo, StaffRepo staffRepo, UserRepo userRepo) {
+        this.adminRepo = adminRepo;
+        this.staffRepo = staffRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -48,24 +45,45 @@ public class CustomTokenEnhancer extends JwtAccessTokenConverter {
 
         User user = (User) oAuth2Authentication.getPrincipal();
 
-        UsernamePasswordAuthenticationToken authentication =
-                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        Optional<AdminEntity> admin = adminRepo.findByEmail(user.getUsername());
 
-        User account = (User) authentication.getPrincipal();
-
-
-        final UserResponseDTO userAdditionalInfo = USER_DTO_USER_RESPONSE_DTO_FUNCTION
-                .apply(userService.findUserByEmail(user.getUsername()));
-
-        switch (account.getUsername()) {
-            case OAuth2Constant.ADMIN_CLIENT_ID:
-                additionalInfo.put("admin", userAdditionalInfo);
-                break;
-
-            case OAuth2Constant.USER_CLIENT_ID:
-                additionalInfo.put("user", userAdditionalInfo);
-                break;
+        if (admin.isPresent()) {
+            UserDTO build = UserDTO.builder()
+                    .id(admin.get().getId())
+                    .email(admin.get().getEmail())
+                    .name(admin.get().getName())
+                    .userRole(admin.get().getUserRole())
+                    .build();
+            additionalInfo.put("user", build);
         }
+
+        Optional<UserEntity> customer = userRepo.findByEmail(user.getUsername());
+
+        if (customer.isPresent()) {
+            UserDTO build = UserDTO.builder()
+                    .id(customer.get().getId())
+                    .email(customer.get().getEmail())
+                    .name(customer.get().getName())
+                    .userRole(customer.get().getUserRole())
+                    .img(customer.get().getImg())
+                    .homeAddress(customer.get().getHomeAddress())
+                    .phoneNumber(customer.get().getPhoneNumber())
+                    .build();
+            additionalInfo.put("user", build);
+        }
+
+        Optional<StaffEntity> staff = staffRepo.findByEmail(user.getUsername());
+
+        if (staff.isPresent()) {
+            UserDTO build = UserDTO.builder()
+                    .id(staff.get().getId())
+                    .email(staff.get().getEmail())
+                    .name(staff.get().getName())
+                    .userRole(staff.get().getUserRole())
+                    .build();
+            additionalInfo.put("user", build);
+        }
+
         // set custom claims
         ((DefaultOAuth2AccessToken) oAuth2AccessToken).setAdditionalInformation(additionalInfo);
         return super.enhance(oAuth2AccessToken, oAuth2Authentication);

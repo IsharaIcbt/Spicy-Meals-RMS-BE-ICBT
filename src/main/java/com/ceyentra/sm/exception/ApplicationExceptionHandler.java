@@ -23,7 +23,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
                 ErrorMessageResponseDTO.builder()
                         .status(100)
                         .success(false)
-                        .message(APPLICATION_ERROR_OCCURRED_MESSAGE)
+                        .message(exception.getMessage())
                         .build(),
                 HttpStatus.OK);
     }

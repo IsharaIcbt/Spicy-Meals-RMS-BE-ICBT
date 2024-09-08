@@ -50,7 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @PostConstruct
     public void init() {
-        Stripe.apiKey = "sk_test_51PtXuxL18030aj4hVq7Y6fEarn0xyqtwWouHUge2IJZE0yN7IsBAYqPxxKguejK4P1VApkirGOw0uyZpJOTtkm1m00UxmzCXF5";
+        Stripe.apiKey = "sk_test_51PtXXpP4mwe0cmZa4Ip5mMYk8etpQKcQ0v92ft8WFuDXdWG4mU3gPFPxglHFDbjzY569Cz8BhbZhWwHoQgNZCKkn00rKwlP6JQ";
     }
 
     @Override

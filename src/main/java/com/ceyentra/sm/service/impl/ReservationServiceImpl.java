@@ -511,10 +511,14 @@ public class ReservationServiceImpl implements ReservationService {
                         .build())
                 .build()).collect(Collectors.toList());
 
+        Long id = mealOrderDetails.get(0).getMealOrder().getId();
+
+        log.info("SESSION_ORDER_ID : {}", id);
+
         SessionCreateParams createParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(DOMAIN + "/apps/meals/checkout/success/" + mealOrderDetails.get(0).getMealOrder().getOrderId())
-                .setCancelUrl(DOMAIN + "/apps/meals/checkout/error/" + mealOrderDetails.get(0).getMealOrder().getOrderId())
+                .setSuccessUrl(DOMAIN + "/apps/meals/checkout/success/" + id)
+                .setCancelUrl(DOMAIN + "/apps/meals/checkout/error/" + id)
                 .addAllLineItem(lineItems)
                 .build();
 

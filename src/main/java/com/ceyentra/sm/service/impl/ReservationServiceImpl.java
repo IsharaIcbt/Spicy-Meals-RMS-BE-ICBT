@@ -499,6 +499,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<SessionCreateParams.LineItem> lineItems = mealOrderDetails.stream().map(mealOrderDetail -> SessionCreateParams.LineItem.builder()
                 .setQuantity(mealOrderDetail.getQty().longValue())
+                .setPrice(String.valueOf(mealOrderDetail.getPrice()))
                 .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                         .setCurrency("LKR")
                         .setUnitAmount(mealOrderDetail.getPrice().longValue())

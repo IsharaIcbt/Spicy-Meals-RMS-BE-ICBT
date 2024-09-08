@@ -499,9 +499,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         List<SessionCreateParams.LineItem> lineItems = mealOrderDetails.stream().map(mealOrderDetail -> SessionCreateParams.LineItem.builder()
                 .setQuantity(mealOrderDetail.getQty().longValue())
-                .setPrice(String.valueOf(mealOrderDetail.getPrice()))
                 .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                        .setCurrency("LKR")
+                        .setCurrency("USD")
                         .setUnitAmount(mealOrderDetail.getPrice().longValue())
                         .setProductData(
                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -514,8 +513,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         SessionCreateParams createParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(DOMAIN + "/success.html")
-                .setCancelUrl(DOMAIN + "/canceled.html")
+                .setSuccessUrl(DOMAIN + "/apps/meals/checkout/success/" + mealOrderDetails.get(0).getMealOrder().getOrderId())
+                .setCancelUrl(DOMAIN + "/apps/meals/checkout/error/" + mealOrderDetails.get(0).getMealOrder().getOrderId())
                 .addAllLineItem(lineItems)
                 .build();
 

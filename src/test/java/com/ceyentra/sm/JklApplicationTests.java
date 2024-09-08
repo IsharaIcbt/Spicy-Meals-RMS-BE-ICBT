@@ -1,5 +1,12 @@
 package com.ceyentra.sm;
 
+import com.ceyentra.sm.dto.web.request.MealOrderAddress;
+import com.ceyentra.sm.dto.web.request.MealOrderItemReq;
+import com.ceyentra.sm.dto.web.request.MealOrderReqDTO;
+import com.ceyentra.sm.dto.web.request.TableReservationReqDTO;
+import com.ceyentra.sm.enums.MealOrderType;
+import com.ceyentra.sm.enums.TableReservationType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,6 +17,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,6 +30,9 @@ class JklApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void testLoginWithBasicAuth() throws Exception {
@@ -51,7 +65,8 @@ class JklApplicationTests {
                         .param("phoneNumber", "0701234567")
                         .param("homeAddress", "ruwanwella")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"message\":\"User successfully registered.\",\"success\":true}"));
     }
 
     @Test
@@ -196,4 +211,68 @@ class JklApplicationTests {
                 .andExpect(content().json("{\"success\":true,\"message\":\"Saved query\"}"));
     }
 
+
+    @Test
+    void testSaveTableReservation() throws Exception {
+
+        TableReservationReqDTO reqDTO = TableReservationReqDTO.builder()
+                .restaurantId(1L)
+                .name("John Doe")
+                .email("john.doe@example.com")
+                .phone("0775906848")
+                .date(new Date())
+                .reservationType(TableReservationType.STREET_DINING)
+                .seats(4)
+                .note("Birthday dinner reservation")
+                .build();
+
+        String jsonPayload = objectMapper.writeValueAsString(reqDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/v1/reservation/table")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic VVNFUjo=")
+                        .content(jsonPayload))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"success\":true,\"message\":\"Table reservation saved successfully.\"}"));
+    }
+
+
+    @Test
+    void testSaveMealOrder() throws Exception {
+
+        MealOrderItemReq item1 = MealOrderItemReq.builder()
+                .id(1L)
+                .qty(2.0F)
+                .build();
+
+        MealOrderItemReq item2 = MealOrderItemReq.builder()
+                .id(2L)
+                .qty(1.5F)
+                .build();
+
+        MealOrderAddress address = MealOrderAddress.builder()
+                .address("")
+                .fullName("")
+                .mobileNumber("")
+                .restaurantId(1L)
+                .build();
+
+        MealOrderReqDTO reqDTO = MealOrderReqDTO.builder()
+                .restaurantId(1L)
+                .isDiffAddress(true)
+                .orderType(MealOrderType.ONLINE)
+                .items(new ArrayList<>(Arrays.asList(item1, item2)))
+                .address(address)
+                .build();
+
+        String jsonPayload = objectMapper.writeValueAsString(reqDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/v1/reservation/meal")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Basic VVNFUjo=")
+                        .content(jsonPayload))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
 }

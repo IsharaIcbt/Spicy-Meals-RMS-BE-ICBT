@@ -50,7 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @PostConstruct
     public void init() {
-        Stripe.apiKey = "sk_test_51PtXuxL18030aj4hVq7Y6fEarn0xyqtwWouHUge2IJZE0yN7IsBAYqPxxKguejK4P1VApkirGOw0uyZpJOTtkm1m00UxmzCXF5";
+        Stripe.apiKey = "sk_test_51PtXXpP4mwe0cmZa4Ip5mMYk8etpQKcQ0v92ft8WFuDXdWG4mU3gPFPxglHFDbjzY569Cz8BhbZhWwHoQgNZCKkn00rKwlP6JQ";
     }
 
     @Override
@@ -146,7 +146,7 @@ public class ReservationServiceImpl implements ReservationService {
 
                     float price = meal.get().getDiscount() == null ? meal.get().getPrice() : meal.get().getPrice() - meal.get().getDiscount();
 
-                    total.updateAndGet(v -> v + price);
+                    total.updateAndGet(v -> v + price * item.getQty());
 
                     return MealOrderDetail.builder()
                             .meal(meal.get())
@@ -175,7 +175,8 @@ public class ReservationServiceImpl implements ReservationService {
                             .sessionLink(generatePaymentSessionLinkMealOrder(orderDetails))
                             .build();
                 } catch (Exception e) {
-                    throw new ApplicationServiceException(200, false, "Error while saving order details!");
+                    log.error(e);
+                    throw new ApplicationServiceException(200, false, e.getMessage());
                 }
 
             } else {
@@ -499,7 +500,7 @@ public class ReservationServiceImpl implements ReservationService {
         List<SessionCreateParams.LineItem> lineItems = mealOrderDetails.stream().map(mealOrderDetail -> SessionCreateParams.LineItem.builder()
                 .setQuantity(mealOrderDetail.getQty().longValue())
                 .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                        .setCurrency("LKR")
+                        .setCurrency("USD")
                         .setUnitAmount(mealOrderDetail.getPrice().longValue())
                         .setProductData(
                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -510,10 +511,14 @@ public class ReservationServiceImpl implements ReservationService {
                         .build())
                 .build()).collect(Collectors.toList());
 
+        Long id = mealOrderDetails.get(0).getMealOrder().getId();
+
+        log.info("SESSION_ORDER_ID : {}", id);
+
         SessionCreateParams createParams = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(DOMAIN + "/success.html")
-                .setCancelUrl(DOMAIN + "/canceled.html")
+                .setSuccessUrl(DOMAIN + "/apps/meals/checkout/success/" + id)
+                .setCancelUrl(DOMAIN + "/apps/meals/checkout/error/" + id)
                 .addAllLineItem(lineItems)
                 .build();
 
@@ -533,7 +538,7 @@ public class ReservationServiceImpl implements ReservationService {
             mealOrderEntity.get().getPayment().setPaymentStatus(PaymentStatus.PAID);
             mealOrderRepo.save(mealOrderEntity.get());
 
-        }else{
+        } else {
             Optional<TableReservationEntity> tableReservation = tableReservationRepo.findById(orderId);
 
             if (!tableReservation.isPresent()) {

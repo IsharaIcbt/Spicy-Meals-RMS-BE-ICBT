@@ -450,14 +450,14 @@ public class ReservationServiceImpl implements ReservationService {
                         throw new ApplicationServiceException(200, false, "Meal order does not exist");
                     }
 
-                    mealOrderEntity.get().setOperationalStatus(reqDTO.getMStatus());
+                    mealOrderEntity.get().setOperationalStatus(reqDTO.getMealStatus());
                     mealOrderEntity.get().setUpdatedDate(new Date());
                     mealOrderRepo.save(mealOrderEntity.get());
 
                     try {
                         emailService.sendUserMealOrderOperationalStatusChangeEmail(UserDTO.builder()
                                 .email(mealOrderEntity.get().getUserEntity().getEmail())
-                                .build(), mealOrderEntity.get(), reqDTO.getMStatus());
+                                .build(), mealOrderEntity.get(), reqDTO.getMealStatus());
                     } catch (MessagingException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -471,7 +471,7 @@ public class ReservationServiceImpl implements ReservationService {
                         throw new ApplicationServiceException(200, false, "Meal order does not exist");
                     }
 
-                    tableReservation.get().setOperationalStatus(reqDTO.getTStatus());
+                    tableReservation.get().setOperationalStatus(reqDTO.getTableStatus());
                     tableReservation.get().setUpdatedDate(new Date());
                     tableReservation.get().setApprovedNote(reqDTO.getNote());
                     tableReservationRepo.save(tableReservation.get());
@@ -479,7 +479,7 @@ public class ReservationServiceImpl implements ReservationService {
                     try {
                         emailService.sendUserTableReservationOperationalStatusChangeEmail(UserDTO.builder()
                                 .email(tableReservation.get().getCustomer().getEmail())
-                                .build(), tableReservation.get(), reqDTO.getTStatus());
+                                .build(), tableReservation.get(), reqDTO.getTableStatus());
                     } catch (MessagingException ex) {
                         throw new RuntimeException(ex);
                     }

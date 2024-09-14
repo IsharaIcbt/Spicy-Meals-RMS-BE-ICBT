@@ -15,9 +15,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReservationApproveReqDTO {
     QueryType type;
-    MealOperationalStatus mStatus;
-    TableReservationOperationalStatus tStatus;
+    MealOperationalStatus mealStatus;
+    TableReservationOperationalStatus tableStatus;
     String note;
     Long userId;
     UserRole userRole;
+
 }
+
